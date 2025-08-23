@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Travel Landing Page</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Language toggle logic
+    function toggleLanguage() {
+      const slider = document.getElementById("lang-slider");
+      const langText = document.getElementById("lang-text");
+
+      // Slide animation
+      slider.classList.toggle("translate-x-0 border-r border-l");
+      slider.classList.toggle("translate-x-full");
+
+      // Toggle between EN and ES
+      langText.textContent = langText.textContent === "EN" ? "ES" : "EN";
+    }
+  </script>
+</head>
+<body class="bg-white text-gray-800">
+
+  <!-- Hero with background that covers header too -->
+  <section class="relative w-full h-[100vh] flex flex-col">
+    
+    <!-- Background Image -->
+    <div class="absolute inset-0">
+      <img src="img/MainHerobg.jpg" 
+           alt="Background" 
+           class="w-full h-full object-cover hero-bg">
+    </div>
+    
+    <!-- Overlay -->
+    <div class="absolute inset-0 bg-black/40"></div>
+
+    <!-- Header sits ON TOP of hero -->
+    <header class="relative z-20 flex flex-wrap justify-between items-center px-4 md:px-8 py-4 border-b border-transparent">
+      <h1 class="text-2xl font-bold text-white">TraveMe</h1>
+      <nav class="flex flex-wrap gap-4 md:space-x-8 text-white font-medium mt-2 md:mt-0">
+        <a href="#" class="hover:text-gray-200">Destination</a>
+        <a href="#" class="hover:text-gray-200">Package</a>
+        <a href="#" class="hover:text-gray-200">Pricing</a>
+        <a href="#" class="hover:text-gray-200">About Us</a>
+      </nav>
+      <div class="flex items-center space-x-3">
+        <!-- Language Switcher -->
+        <div id="lang-switch"
+             class="relative w-28 h-9 rounded-md border border-white/70 overflow-hidden cursor-pointer select-none flex">
+          <!-- Static labels (always visible underneath) -->
+          <div class="w-1/2 flex items-center justify-center text-white font-semibold text-[11px]">EN</div>
+          <div class="w-1/2 flex items-center justify-center text-white font-semibold text-[11px]">ES</div>
+
+          <!-- Transparent slider "window" -->
+          <div id="lang-slider"
+               class="absolute top-0 left-0 w-1/2 h-full border-r border-l border-white rounded-md transition-transform duration-300">
+          </div>
+        </div>
+
+        <!-- Login Button -->
+        <button class="px-4 py-2 border border-white text-white rounded-lg hover:bg-white hover:text-black transition">
+          Log in
+        </button>
+
+        <!-- Register Button -->
+        <button class="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition">
+          Register
+        </button>
+      </div>
+    </header>
+
+    <!-- Hero Content -->
+    <div class="relative z-10 flex flex-1 items-center justify-center text-center text-white px-6">
+      <div class="max-w-2xl">
+        <h2 class="text-3xl md:text-5xl font-extrabold">Easy Trips, More Fun.</h2>
+        <p class="mt-4 text-base md:text-lg">Discover a new way to travel that's fun, easy, and stress-free. Turn your dream destinations into unforgettable realities.</p>
+        <button class="mt-6 px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800">See More</button>
+      </div>
+    </div>
+
+    <!-- Hero Navigation Arrows -->
+    <button id="prev-hero" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-3xl z-30 bg-black/40 rounded-full p-2 hover:bg-black/70">
+      &#10094;
+    </button>
+    <button id="next-hero" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-3xl z-30 bg-black/40 rounded-full p-2 hover:bg-black/70">
+      &#10095;
+    </button>
+  </section>
+
+  <!-- Search Section -->
+  <section class="max-w-5xl mx-auto px-6 py-10">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 bg-white/90 shadow-lg p-6 rounded-xl">
+      <div class="relative flex items-center">
+        <img src="img/location_pin_002.jpg" alt="Location Icon" class="absolute left-3 w-5 h-5">
+        <input type="text" placeholder="City or address" class="border p-3 rounded-lg w-full pl-10">
+      </div>
+      <div class="relative flex items-center">
+        <!-- Calendar Icon -->
+        <svg class="absolute left-3 w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7H3v12a2 2 0 002 2z"/>
+        </svg>
+        <input type="date" class="border p-3 rounded-lg w-full pl-10">
+      </div>
+      <select class="border p-3 rounded-lg w-full">
+        <option>Landscape Type</option>
+        <option>City</option>
+        <option>Desert</option>
+        <option>Beach</option>
+      </select>
+      <div id="search-container" class="relative">
+        <button id="search-btn" class="bg-black text-white rounded-lg px-4 py-3 hover:bg-gray-800 w-full">Search</button>
+        <input id="custom-search" class="input hidden absolute inset-0 w-full" name="text" placeholder="Search..." type="search">
+      </div>
+    </div>
+  </section>
+
+  <!-- Recommended Destinations Section -->
+  <section class="max-w-6xl mx-auto px-6 py-12">
+    <h3 class="text-2xl font-bold mb-6 text-white">Recommended Destinations</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      
+      <!-- Destination Card -->
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <!-- Image placeholder -->
+        <div class="relative h-40 bg-gray-300">
+          <span class="absolute top-2 right-2 bg-white text-xs px-2 py-1 rounded shadow">🇦🇺 Australia</span>
+          <img src="img/Australia.jpg" alt="Destination Image" class="w-full h-full object-cover">
+        </div>
+        <!-- Content -->
+        <div class="p-4">
+          <!-- Review -->
+          <div class="flex items-center text-yellow-500 text-sm mb-2">
+            ★★★★☆ <span class="ml-2 text-gray-600">4.5</span>
+          </div>
+          <!-- Name and Bio -->
+          <h4 class="font-bold text-lg">Whitehaven Beach</h4>
+          <p class="text-gray-600 text-sm mt-1">A tropical paradise famous for its pure white sands and crystal clear waters.</p>
+          <!-- Book Now -->
+          <button class="mt-4 px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700">Book Now</button>
+        </div>
+      </div>
+
+      <!-- Duplicate for more destinations -->
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="relative h-40 bg-gray-300">
+          <span class="absolute top-2 right-2 bg-white text-xs px-2 py-1 rounded shadow">🇨🇭 Switzerland</span>
+          <img src="img/Switzerland.jpg" alt="Destination Image" class="w-full h-full object-cover">
+        </div>
+        <div class="p-4">
+          <div class="flex items-center text-yellow-500 text-sm mb-2">
+            ★★★★☆ <span class="ml-2 text-gray-600">4.7</span>
+          </div>
+          <h4 class="font-bold text-lg">Lake Lucerne</h4>
+          <p class="text-gray-600 text-sm mt-1">Enjoy a serene picnic by the stunning Swiss lake surrounded by mountains.</p>
+          <button class="mt-4 px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700">Book Now</button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="relative h-40 bg-gray-300">
+          <span class="absolute top-2 right-2 bg-white text-xs px-2 py-1 rounded shadow">🇻🇪 Venezuela</span>
+          <img src="img/Venzuela.jpg" alt="Destination Image" class="w-full h-full object-cover">
+        </div>
+        <div class="p-4">
+          <div class="flex items-center text-yellow-500 text-sm mb-2">
+            ★★★★☆ <span class="ml-2 text-gray-600">4.6</span>
+          </div>
+          <h4 class="font-bold text-lg">Angel Falls</h4>
+          <p class="text-gray-600 text-sm mt-1">Witness the world's highest uninterrupted waterfall deep in the Venezuelan jungle.</p>
+          <button class="mt-4 px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700">Book Now</button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="relative h-40 bg-gray-300">
+          <span class="absolute top-2 right-2 bg-white text-xs px-2 py-1 rounded shadow">🇫🇷 France</span>
+          <img src="img/snailpeople.jpg" alt="Louvre Museum" class="w-full h-full object-cover">
+        </div>
+        <div class="p-4">
+          <div class="flex items-center text-yellow-500 text-sm mb-2">
+            ★★★★☆ <span class="ml-2 text-gray-600">4.8</span>
+          </div>
+          <h4 class="font-bold text-lg">The Louvre</h4>
+          <p class="text-gray-600 text-sm mt-1">Explore the world's largest art museum and historic monument in the heart of Paris.</p>
+          <button class="mt-4 px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700">Book Now</button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="relative h-40 bg-gray-300">
+          <span class="absolute top-2 right-2 bg-white text-xs px-2 py-1 rounded shadow">🇲🇽 Mexico</span>
+          <img src="img/Aztec.jpg" alt="Chichen Itza" class="w-full h-full object-cover">
+        </div>
+        <div class="p-4">
+          <div class="flex items-center text-yellow-500 text-sm mb-2">
+            ★★★★☆ <span class="ml-2 text-gray-600">4.9</span>
+          </div>
+          <h4 class="font-bold text-lg">Chichen Itza</h4>
+          <p class="text-gray-600 text-sm mt-1">Visit the ancient Mayan city and marvel at the iconic El Castillo pyramid in Mexico.</p>
+          <button class="mt-4 px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700">Book Now</button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="relative h-40 bg-gray-300">
+          <span class="absolute top-2 right-2 bg-white text-xs px-2 py-1 rounded shadow">🇮🇹 Italy</span>
+          <img src="img/Pisa.jpg" alt="Leaning Tower of Pisa" class="w-full h-full object-cover">
+        </div>
+        <div class="p-4">
+          <div class="flex items-center text-yellow-500 text-sm mb-2">
+            ★★★★☆ <span class="ml-2 text-gray-600">4.7</span>
+          </div>
+          <h4 class="font-bold text-lg">Leaning Tower of Pisa</h4>
+          <p class="text-gray-600 text-sm mt-1">Marvel at the iconic Leaning Tower of Pisa, a world-famous architectural wonder in Italy.</p>
+          <button class="mt-4 px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700">Book Now</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+<script>
+  (function () {
+    const box = document.getElementById('lang-switch');
+    const slider = document.getElementById('lang-slider');
+    let isES = false;
+
+    box.addEventListener('click', () => {
+      isES = !isES;
+      slider.style.transform = isES ? 'translateX(100%)' : 'translateX(0%)';
+    });
+  }());
+
+  const searchBtn = document.getElementById('search-btn');
+  const customSearch = document.getElementById('custom-search');
+  const searchContainer = document.getElementById('search-container');
+
+  searchBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    searchBtn.classList.add('hidden');
+    customSearch.classList.remove('hidden');
+    customSearch.focus();
+  });
+
+  // Revert back when pressing Enter or clicking outside
+  customSearch.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      customSearch.classList.add('hidden');
+      searchBtn.classList.remove('hidden');
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!searchContainer.contains(e.target)) {
+      customSearch.classList.add('hidden');
+      searchBtn.classList.remove('hidden');
+    }
+  });
+
+  const heroBg = document.querySelector(".hero-bg");
+  const heroImages = [
+    "img/MainHerobg.jpg",
+    "img/Australia.jpg",
+    "img/Switzerland.jpg",
+    "img/Aztec.jpg",
+    "img/snailpeople.jpg",
+    "img/Venzuela.jpg",
+    "img/Pisa.jpg",
+    "img/Mount-Fuji.jpg",
+    "img/GGB.jpg",
+    
+
+  ];
+  let currentHero = 0;
+
+  function updateHero() {
+    heroBg.src = heroImages[currentHero];
+  }
+
+  document.getElementById("prev-hero").addEventListener("click", () => {
+    currentHero = (currentHero - 1 + heroImages.length) % heroImages.length;
+    updateHero();
+  });
+
+  document.getElementById("next-hero").addEventListener("click", () => {
+    currentHero = (currentHero + 1) % heroImages.length;
+    updateHero();
+  });
+</script>
+<style>
+  .input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  .input:focus {
+    border-color: #000;
+  }
+  .hidden {
+    display: none;
+  }
+</style>
+<style>
+  html, body {
+    overscroll-behavior: none;
+    overscroll-behavior-y: none;
+  }
+</style>
+</body>
+</html>s
+<style>
+.input-container {
+  position: relative;
+  display: flex;
+  height: 2.8rem;
+  width: 100%;
+  min-width: 200px;
+  max-width: 250px;
+  background-color: #cbcbcb;
+  border-radius: 8px;
+  box-shadow: 20px 20px 30px rgba(0, 0, 0, .05);
+}
+
+.input-container input {
+  height: 100%;
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid  rgb(255, 255, 255);
+  background-color: transparent;
+  padding: 0.625rem 70px 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 400;
+  color: rgb(0, 0, 0);
+  outline: none;
+  transition: all .15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.input-container input:focus {
+  border: 1px solid rgb(0, 0, 0);
+}
+
+.invite-btn {
+  position: absolute;
+  width: 65px;
+  right: 4px;
+  top: 4px;
+  bottom: 4px;
+  z-index: 10;
+  border-radius: 4px;
+  background-color:black;
+  color: #ffffff;
+  padding-top: .25rem;
+  padding-bottom: .25rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  border: none;
+  transition: .6s ease;
+}
+
+.invite-btn:hover {
+  right: 2px;
+  top: 2px;
+  bottom: 2px;
+  border-radius: 8px;
+}
+
+.input-container input:placeholder-shown ~ .invite-btn {
+  pointer-events: none;
+  background-color: rgb(0, 0, 0);
+  opacity: 0.5;
+}
+</style>
+<!-- Agency Value Section -->
+<section class="max-w-6xl mx-auto px-6 py-16">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+    
+    <!-- Left: Text & Bonuses -->
+    <div>
+      <h3 class="text-3xl font-bold text-gray-800 mb-4">Elevate your adventures</h3>
+      <p class="text-gray-600 mb-8">
+        At TraveMe, we believe every journey should be effortless, exciting, and unforgettable. 
+        That’s why we go beyond just booking trips — we craft experiences that elevate the way you see the world.
+      </p>
+
+      <!-- Bonuses Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="p-6 bg-white rounded-lg shadow">
+          <h4 class="font-semibold text-gray-800">Professional Tour Guides</h4>
+          <p class="text-sm text-gray-600 mt-1">Explore with experts who bring destinations to life.</p>
+        </div>
+        <div class="p-6 bg-white rounded-lg shadow">
+          <h4 class="font-semibold text-gray-800">Diving & Snorkeling</h4>
+          <p class="text-sm text-gray-600 mt-1">Unforgettable underwater adventures in stunning reefs.</p>
+        </div>
+        <div class="p-6 bg-white rounded-lg shadow">
+          <h4 class="font-semibold text-gray-800">Memorable Moments</h4>
+          <p class="text-sm text-gray-600 mt-1">Trips designed to create stories worth sharing.</p>
+        </div>
+        <div class="p-6 bg-white rounded-lg shadow">
+          <h4 class="font-semibold text-gray-800">Easy & Comfortable</h4>
+          <p class="text-sm text-gray-600 mt-1">Seamless travel with comfort every step of the way.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Image & Flag -->
+<div class="relative w-[450px] mx-auto lg:mx-0">
+  <!-- Main Image -->
+  <div class="h-[600px] bg-gray-300 rounded-lg overflow-hidden">
+    <img id="main-image" src="img/Eko.jpg" alt="Nigeria Travel" class="w-full h-full object-cover">
+  </div>
+  <!-- Nigerian Flag -->
+  <span class="absolute top-2 left-2 bg-white px-2 py-1 text-xs rounded shadow">🇳🇬 Nigeria</span>
+  <!-- Thumbnails -->
+  <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2 bg-white/80 px-2 py-1 rounded-lg shadow">
+    <div class="w-16 h-12 bg-gray-400 rounded overflow-hidden cursor-pointer">
+      <img src="img/National Theatre.jpg" alt="thumb" class="w-full h-full object-cover thumbnail">
+    </div>
+    <div class="w-16 h-12 bg-gray-400 rounded overflow-hidden cursor-pointer">
+      <img src="img/link bridge.jpg" alt="thumb" class="w-full h-full object-cover thumbnail">
+    </div>
+    <div class="w-16 h-12 bg-gray-400 rounded overflow-hidden cursor-pointer">
+      <img src="img/Rock.jpg" alt="thumb" class="w-full h-full object-cover thumbnail">
+    </div>
+    <div class="w-16 h-12 bg-gray-400 rounded overflow-hidden cursor-pointer">
+      <img src="img/Eko.jpg" alt="thumb" class="w-full h-full object-cover thumbnail">
+    </div>
+    <div class="w-16 h-12 bg-gray-400 rounded overflow-hidden cursor-pointer">
+      <img src="img/Cowie Termial.jpg" alt="thumb" class="w-full h-full object-cover thumbnail">
+    </div>
+  </div>
+</div>
+</section>
+<script>
+  // Thumbnail click handler
+  const mainImage = document.getElementById("main-image");
+  const thumbnails = document.querySelectorAll(".thumbnail");
+
+  thumbnails.forEach(thumb => {
+    thumb.addEventListener("click", () => {
+      mainImage.src = thumb.src; // replace big image with thumbnail image
+    });
+  });
+</script>
+<!-- Top Picks Section -->
+<section class="w-full relative py-16">
+  <!-- Big Image Background with gradient overlay -->
+  <div class="relative w-full h-[800px] md:h-[900px]">
+    <!-- Image with gradient overlay -->
+    <div class="relative w-full h-full">
+      <img src="img/Boat.jpg" alt="Top Picks Background" class="w-full h-full object-cover">
+      <!-- Gradient overlay directly on the image -->
+      <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-white via-white/50 to-transparent"></div>
+    </div>
+
+    <!-- Overlay Title -->
+    <div class="absolute top-60 inset-x-0 flex items-center justify-center">
+      <h2 class="text-3xl md:text-5xl font-bold text-black text-center px-4">
+        Where Comfort Meets Convenience <br> Our Top Stay Picks for You
+      </h2>
+    </div>
+
+    <!-- Flash Card (stacked look) -->
+    <div class="absolute inset-x-0 top-[65.5%] flex justify-center">
+      <!-- Stacked background cards -->
+      <div class="absolute top-6 w-[80%] md:w-[65%] h-44 bg-white rounded-xl shadow opacity-60"></div>
+      <div class="absolute top-3 w-[82%] md:w-[67%] h-44 bg-white rounded-xl shadow opacity-80"></div>
+      
+      <!-- Main Card -->
+      <div class="relative flex bg-white rounded-xl shadow-lg overflow-hidden w-[85%] md:w-[70%] h-44">
+        <!-- Image -->
+        <div class="w-1/3 h-full bg-gray-300">
+          <img src="img/Dam square.jpg" alt="Dam square" class="w-full h-full object-cover">
+        </div>
+        <!-- Text -->
+        <div class="p-4 flex flex-col justify-center">
+          <span class="text-sm text-gray-500">-005</span>
+          <h4 class="font-bold text-lg">Dam square</h4>
+          <p class="text-gray-600 text-sm mt-1">Start discovering royal heritage and get more enchanting urban scenes.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- See More Button -->
+    <div class="absolute bottom-12 inset-x-0 flex justify-center">
+      <button class="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition">
+        See More
+      </button>
+    </div>
+  </div>
+</section>
+<!-- Blog Section -->
+<section class="max-w-6xl mx-auto px-6 py-16">
+  <h2 class="text-3xl md:text-4xl font-bold mb-10">Although A Picture Is Worth A Thousand Words</h2>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+    <!-- Card 1 -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+      <img src="img/Boat.jpg" alt="Solo Travel" class="w-full h-48 object-cover">
+      <div class="p-4">
+        <div class="flex items-center justify-between text-xs text-gray-500 mb-2">
+          <span class="bg-blue-600 text-white px-2 py-1 rounded">Traveling</span>
+          <span>10 min read</span>
+          <span class="flex items-center space-x-1">
+            <!-- Calendar Icon -->
+            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7H3v12a2 2 0 002 2z"/>
+            </svg>
+            <span>12 Sep 2025</span>
+          </span>
+        </div>
+        <h3 class="font-bold text-lg">5 Reasons Why Solo Travel Is the Best Gift You Can Give Yourself</h3>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+      <img src="img/Mount-Fuji.jpg" alt="Underrated Travel Destinations" class="w-full h-48 object-cover">
+      <div class="p-4">
+        <div class="flex items-center justify-between text-xs text-gray-500 mb-2">
+          <span class="bg-blue-600 text-white px-2 py-1 rounded">Traveling</span>
+          <span>10 min read</span>
+          <span class="flex items-center space-x-1">
+            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7H3v12a2 2 0 002 2z"/>
+            </svg>
+            <span>12 Sep 2025</span>
+          </span>
+        </div>
+        <h3 class="font-bold text-lg">Underrated Travel Destinations You Should Visit This Year</h3>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+      <img src="img/Ghana .jpg" alt="Weekend Getaway" class="w-full h-48 object-cover">
+      <div class="p-4">
+        <div class="flex items-center justify-between text-xs text-gray-500 mb-2">
+          <span class="bg-blue-600 text-white px-2 py-1 rounded">Traveling</span>
+          <span>10 min read</span>
+          <span class="flex items-center space-x-1">
+            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7H3v12a2 2 0 002 2z"/>
+            </svg>
+            <span>12 Sep 2025</span>
+          </span>
+        </div>
+        <h3 class="font-bold text-lg">How to Plan the Perfect Weekend Getaway Without the Stress</h3>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Testimonial Section -->
+<section class="max-w-3xl mx-auto px-6 py-16 text-center">
+  <!-- Quotation Mark Icon + Avatar -->
+  <div class="flex justify-center items-center space-x-2 mb-6">
+    <span class="text-4xl text-gray-400">“</span>
+    <img src="img/Made in china.jpg" alt="Reviewer" class="w-12 h-12 rounded-full border">
+  </div>
+
+  <!-- Quote -->
+  <p class="text-2xl md:text-3xl font-medium text-gray-800 leading-relaxed mb-6">
+    Traveling alone was something I used to fear, but it turned out to be the most empowering experience of my life.
+  </p>
+
+  <!-- Rating -->
+  <div class="flex justify-center items-center space-x-2">
+    <div class="flex text-yellow-500">
+      ★★★★★
+    </div>
+    <span class="text-gray-700 font-medium">5.0</span>
+  </div>
+
+  <!-- Author -->
+  <p class="text-sm text-gray-500 mt-2">Jake Danielson, Guest</p>
+</section>
+<!-- Contact Section -->
+<section class="relative w-full">
+  <!-- Background Image -->
+  <div class="absolute top-[-5px] left-0 right-0 h-[450px] w-[calc(100%-50px)] mx-auto rounded-2xl overflow-hidden">
+    <img src="img/Beach.jpeg" alt="Travel Background" class="w-full h-full object-cover">
+    <div class="absolute inset-0 bg-black/40"></div> <!-- Overlay -->
+  </div>
+
+  <!-- Content -->
+  <div class="relative z-10 max-w-4xl mx-auto px-6 text-center text-white h-[450px] flex flex-col justify-center">
+    <!-- Title -->
+    <h2 class="text-3xl md:text-4xl font-bold mb-4">
+      Reach out anytime for travel tips or info
+    </h2>
+
+    <!-- Bio -->
+    <p class="mb-8 max-w-2xl mx-auto text-lg">
+      Whether you're planning your next adventure, need more details about our services, 
+      or just want to chat about travel ideas – don't hesitate to reach out.
+    </p>
+
+    <!-- Email Input -->
+    <div class="flex justify-center">
+      <div class="input-container">
+        <input required="" placeholder="Email Address" type="email">
+        <button class="invite-btn" type="button">
+          Submit
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer Section -->
+<footer class="w-full bg-black text-white pt-12 pb-8">
+  <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-10">
+    <!-- Left Side -->
+    <div class="flex flex-col space-y-5 md:col-span-1">
+      <span class="text-sm text-gray-400">&copy; 2024 TraveMe. All rights reserved.</span>
+      <!-- Image box -->
+      <div class="w-32 h-24 rounded-xl overflow-hidden">
+        <img src="img/Eko.jpg" alt="Footer Image" class="w-full h-full object-cover rounded-xl">
+      </div>
+      <!-- Social Media Icons -->
+      <div class="flex space-x-4 mt-2">
+        <a href="#" class="hover:text-cyan-400 transition"><i class="fab fa-facebook-f text-xl"></i></a>
+        <a href="#" class="hover:text-cyan-400 transition"><i class="fab fa-twitter text-xl"></i></a>
+        <a href="#" class="hover:text-cyan-400 transition"><i class="fab fa-instagram text-xl"></i></a>
+        <a href="#" class="hover:text-cyan-400 transition"><i class="fab fa-linkedin-in text-xl"></i></a>
+      </div>
+    </div>
+
+    <!-- Middle -->
+    <div class="flex flex-col justify-center items-center md:col-span-1 lg:col-span-2">
+      <h2 class="text-2xl md:text-4xl font-extrabold text-center mb-2">Let’s Make Your Next Journey Unforgettable</h2>
+    </div>
+
+    <!-- Right Side -->
+    <div class="flex flex-col md:items-end md:justify-between md:col-span-1">
+      <div class="mb-5">
+        <h3 class="font-semibold text-lg mb-2">Contact</h3>
+        <ul class="text-sm text-gray-300 space-y-1">
+          <li>Email: <a href="mailto:info@traveme.com" class="hover:text-cyan-400">info@traveme.com</a></li>
+          <li>Phone: <a href="tel:+123456789" class="hover:text-cyan-400">+1 234 567 89</a></li>
+          <li>123 Adventure Ave, Wanderlust City</li>
+        </ul>
+      </div>
+      <div class="grid grid-cols-2 gap-6">
+        <div>
+          <h4 class="font-semibold mb-2">Company</h4>
+          <ul class="space-y-1 text-sm text-gray-300">
+            <li><a href="#" class="hover:text-cyan-400">About Us</a></li>
+            <li><a href="#" class="hover:text-cyan-400">Careers</a></li>
+            <li><a href="#" class="hover:text-cyan-400">Blog</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-2">Resources</h4>
+          <ul class="space-y-1 text-sm text-gray-300">
+            <li><a href="#" class="hover:text-cyan-400">Help Center</a></li>
+            <li><a href="#" class="hover:text-cyan-400">Privacy Policy</a></li>
+            <li><a href="#" class="hover:text-cyan-400">Terms</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+<!--  CDN for social icons (only for demo, use local/prod as needed) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
