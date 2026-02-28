@@ -1,680 +1,1545 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth overscroll-none">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Travel Landing Page</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    // Language toggle logic
-    function toggleLanguage() {
-      const slider = document.getElementById("lang-slider");
-      const langText = document.getElementById("lang-text");
+  <title>TraveMe</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-      // Slide animation
-      slider.classList.toggle("translate-x-0 border-r border-l");
-      slider.classList.toggle("translate-x-full");
-
-      // Toggle between EN and ES
-      langText.textContent = langText.textContent === "EN" ? "ES" : "EN";
+    :root {
+      --ink: #0e0e0e;
+      --cream: #f5f0e8;
+      --sand: #e8dfc8;
+      --terra: #c4714a;
+      --teal: #2d6e6e;
+      --gold: #c9a84c;
+      --mist: #8a9ba8;
+      --white: #ffffff;
     }
-  </script>
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      overflow-x: hidden;
+      overscroll-behavior: none;
+    }
+
+    /* ─── CURSOR ─── */
+    .cursor {
+      position: fixed; width: 10px; height: 10px;
+      background: var(--terra); border-radius: 50%;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width .2s, height .2s, background .2s;
+    }
+    .cursor-ring {
+      position: fixed; width: 36px; height: 36px;
+      border: 1.5px solid var(--terra); border-radius: 50%;
+      pointer-events: none; z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: all .12s ease;
+      opacity: .6;
+    }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--cream); }
+    ::-webkit-scrollbar-thumb { background: var(--terra); border-radius: 2px; }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.4rem 3rem;
+      transition: background .4s, backdrop-filter .4s, box-shadow .4s;
+    }
+    nav.scrolled {
+      background: rgba(245,240,232,.92);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 1px 0 rgba(0,0,0,.08);
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem; font-weight: 900;
+      color: var(--white); letter-spacing: -.02em;
+      transition: color .4s;
+    }
+    nav.scrolled .nav-logo { color: var(--ink); }
+
+    .nav-links { display: flex; gap: 2.4rem; list-style: none; }
+    .nav-links a {
+      font-size: .85rem; font-weight: 500; letter-spacing: .06em;
+      text-transform: uppercase; text-decoration: none;
+      color: rgba(255,255,255,.85); transition: color .3s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -3px; left: 0;
+      width: 0; height: 1.5px; background: var(--terra);
+      transition: width .3s;
+    }
+    .nav-links a:hover::after { width: 100%; }
+    nav.scrolled .nav-links a { color: var(--ink); }
+    .nav-links a:hover { color: var(--terra); }
+
+    .nav-actions { display: flex; align-items: center; gap: 1rem; }
+
+    .lang-pill {
+      display: flex; border: 1px solid rgba(255,255,255,.5);
+      border-radius: 30px; overflow: hidden; cursor: pointer;
+      transition: border-color .4s;
+    }
+    nav.scrolled .lang-pill { border-color: rgba(0,0,0,.2); }
+    .lang-pill span {
+      padding: .3rem .9rem; font-size: .75rem; font-weight: 600;
+      letter-spacing: .06em; color: rgba(255,255,255,.7);
+      transition: background .3s, color .3s;
+    }
+    nav.scrolled .lang-pill span { color: var(--mist); }
+    .lang-pill span.active { background: var(--terra); color: var(--white) !important; }
+
+    .btn-login {
+      padding: .45rem 1.2rem; border: 1px solid rgba(255,255,255,.6);
+      background: transparent; color: var(--white); border-radius: 30px;
+      font-size: .8rem; font-weight: 500; cursor: pointer;
+      letter-spacing: .04em; transition: all .3s;
+    }
+    .btn-login:hover { background: rgba(255,255,255,.15); }
+    nav.scrolled .btn-login { border-color: var(--ink); color: var(--ink); }
+    nav.scrolled .btn-login:hover { background: var(--ink); color: var(--white); }
+
+    .btn-register {
+      padding: .45rem 1.4rem; background: var(--terra);
+      color: var(--white); border: none; border-radius: 30px;
+      font-size: .8rem; font-weight: 600; cursor: pointer;
+      letter-spacing: .04em; transition: background .3s, transform .2s;
+    }
+    .btn-register:hover { background: #b5603d; transform: translateY(-1px); }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative; height: 100vh; min-height: 640px;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, #0f2027 0%, #203a43 40%, #2c5364 70%, #1a3a2a 100%);
+    }
+    .hero-bg::before {
+      content: ''; position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 20% 30%, rgba(196,113,74,.35) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 60% at 80% 70%, rgba(45,110,110,.4) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 40% at 60% 20%, rgba(201,168,76,.2) 0%, transparent 50%);
+      animation: meshShift 8s ease-in-out infinite alternate;
+    }
+    @keyframes meshShift {
+      0%   { opacity: 1; transform: scale(1) rotate(0deg); }
+      100% { opacity: .8; transform: scale(1.04) rotate(1deg); }
+    }
+
+    .particle {
+      position: absolute; border-radius: 50%;
+      background: rgba(255,255,255,.08);
+      animation: float linear infinite;
+    }
+    @keyframes float {
+      0%   { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: .5; }
+      100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+    }
+
+    .hero-grid {
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    .hero-content {
+      position: relative; z-index: 10;
+      text-align: center; color: var(--white);
+      padding: 0 1.5rem; max-width: 760px;
+    }
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: .75rem; letter-spacing: .2em; font-weight: 500;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 1.2rem; opacity: 0;
+    }
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 7vw, 6rem);
+      line-height: 1.05; font-weight: 900;
+      letter-spacing: -.02em;
+      opacity: 0;
+    }
+    .hero-title em { font-style: italic; color: var(--terra); }
+    .hero-sub {
+      margin-top: 1.4rem; font-size: 1.05rem; font-weight: 300;
+      color: rgba(255,255,255,.75); line-height: 1.7;
+      max-width: 500px; margin-left: auto; margin-right: auto;
+      opacity: 0;
+    }
+    .hero-cta { margin-top: 2.4rem; display: flex; gap: 1rem; justify-content: center; opacity: 0; }
+    .btn-primary {
+      padding: .85rem 2.2rem; background: var(--terra);
+      color: var(--white); border: none; border-radius: 4px;
+      font-size: .9rem; font-weight: 600; cursor: pointer;
+      letter-spacing: .05em; text-transform: uppercase;
+      transition: background .3s, transform .2s, box-shadow .3s;
+      box-shadow: 0 4px 20px rgba(196,113,74,.4);
+    }
+    .btn-primary:hover { background: #b5603d; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(196,113,74,.5); }
+    .btn-ghost {
+      padding: .85rem 2.2rem; background: transparent;
+      color: var(--white); border: 1px solid rgba(255,255,255,.4);
+      border-radius: 4px; font-size: .9rem; font-weight: 500;
+      cursor: pointer; letter-spacing: .05em; text-transform: uppercase;
+      transition: background .3s, border-color .3s;
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.7); }
+
+    .hero-arrow {
+      position: absolute; top: 50%; z-index: 20;
+      transform: translateY(-50%);
+      width: 48px; height: 48px; border-radius: 50%;
+      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.25);
+      color: white; font-size: 1.1rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px);
+      transition: background .3s, transform .3s;
+    }
+    .hero-arrow:hover { background: rgba(255,255,255,.25); transform: translateY(-50%) scale(1.05); }
+    #prev-hero { left: 2rem; }
+    #next-hero { right: 2rem; }
+
+    .hero-dots {
+      position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+      display: flex; gap: .5rem; z-index: 20;
+    }
+    .dot {
+      width: 6px; height: 6px; border-radius: 3px;
+      background: rgba(255,255,255,.3); transition: width .4s, background .4s;
+      cursor: pointer;
+    }
+    .dot.active { width: 28px; background: var(--terra); }
+
+    .scroll-hint {
+      position: absolute; bottom: 2.5rem; right: 3rem; z-index: 20;
+      display: flex; flex-direction: column; align-items: center; gap: .4rem;
+      color: rgba(255,255,255,.5); font-size: .7rem; letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    .scroll-line {
+      width: 1px; height: 50px; background: rgba(255,255,255,.3);
+      position: relative; overflow: hidden;
+    }
+    .scroll-line::after {
+      content: ''; position: absolute; top: -100%; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(to bottom, transparent, rgba(255,255,255,.7), transparent);
+      animation: scrollAnim 2s ease-in-out infinite;
+    }
+    @keyframes scrollAnim {
+      0%   { top: -100%; }
+      100% { top: 100%; }
+    }
+
+    /* ─── SEARCH BAR ─── */
+    .search-section {
+      max-width: 900px; margin: -2.5rem auto 0;
+      padding: 0 1.5rem; position: relative; z-index: 40;
+    }
+    .search-box {
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.15);
+      padding: 1.4rem 1.8rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 1rem;
+      align-items: center;
+    }
+    .search-field {
+      display: flex; flex-direction: column; gap: .25rem;
+    }
+    .search-field label {
+      font-size: .7rem; font-weight: 600; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--mist);
+    }
+    .search-field input,
+    .search-field select {
+      border: none; outline: none; background: transparent;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .95rem; color: var(--ink);
+      padding: .2rem 0;
+      border-bottom: 1.5px solid var(--sand);
+      transition: border-color .3s;
+    }
+    .search-field input:focus,
+    .search-field select:focus { border-color: var(--terra); }
+    .search-divider { width: 1px; height: 40px; background: var(--sand); }
+    .btn-search {
+      padding: .9rem 2rem; background: var(--ink);
+      color: var(--white); border: none; border-radius: 8px;
+      font-size: .85rem; font-weight: 600; cursor: pointer;
+      letter-spacing: .06em; text-transform: uppercase;
+      transition: background .3s, transform .2s;
+      white-space: nowrap;
+    }
+    .btn-search:hover { background: var(--terra); transform: translateY(-1px); }
+
+    /* ─── CUSTOM DATE PICKER ─── */
+    .date-field { position: relative; }
+    .date-display {
+      display: flex; align-items: center; gap: .5rem;
+      cursor: pointer; padding: .2rem 0;
+      border-bottom: 1.5px solid var(--sand);
+      transition: border-color .3s;
+    }
+    .date-display:hover { border-color: var(--terra); }
+    .date-display .date-val {
+      font-size: .95rem; color: var(--ink); font-family: 'DM Sans', sans-serif;
+      user-select: none;
+    }
+    .date-display .date-val.placeholder { color: #aaa; }
+    .date-display .cal-icon { color: var(--mist); font-size: .85rem; }
+
+    .cal-popup {
+      display: none; position: absolute; top: calc(100% + 14px); left: 50%;
+      transform: translateX(-50%);
+      background: var(--white); border-radius: 14px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.18);
+      padding: 1.2rem; width: 280px; z-index: 200;
+      animation: popIn .2s ease;
+    }
+    .cal-popup.open { display: block; }
+    @keyframes popIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+      to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+    .cal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .cal-nav {
+      width: 28px; height: 28px; border-radius: 50%; border: none;
+      background: var(--sand); cursor: pointer; font-size: .85rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s;
+    }
+    .cal-nav:hover { background: var(--terra); color: white; }
+    .cal-month-label {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem; font-weight: 700;
+    }
+    .cal-weekdays {
+      display: grid; grid-template-columns: repeat(7,1fr);
+      margin-bottom: .4rem;
+    }
+    .cal-weekdays span {
+      text-align: center; font-size: .68rem; font-weight: 700;
+      color: var(--mist); letter-spacing: .06em; padding: .2rem 0;
+    }
+    .cal-days {
+      display: grid; grid-template-columns: repeat(7,1fr); gap: 2px;
+    }
+    .cal-day {
+      aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+      font-size: .82rem; border-radius: 50%; cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .cal-day:hover:not(.empty):not(.disabled) { background: var(--sand); }
+    .cal-day.today { font-weight: 700; color: var(--terra); }
+    .cal-day.selected { background: var(--terra) !important; color: white !important; border-radius: 50%; }
+    .cal-day.disabled { color: #ddd; cursor: default; pointer-events: none; }
+    .cal-day.empty { pointer-events: none; }
+    .cal-confirm {
+      margin-top: 1rem; width: 100%; padding: .6rem;
+      background: var(--ink); color: white; border: none; border-radius: 6px;
+      font-size: .8rem; font-weight: 600; cursor: pointer; letter-spacing: .06em;
+      text-transform: uppercase; transition: background .2s;
+    }
+    .cal-confirm:hover { background: var(--terra); }
+    section { padding: 6rem 1.5rem; }
+    .section-label {
+      font-size: .72rem; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--terra); font-weight: 600; margin-bottom: .6rem;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3rem); font-weight: 900;
+      line-height: 1.15; letter-spacing: -.02em;
+    }
+
+    /* ─── DESTINATIONS ─── */
+    .destinations { background: var(--cream); }
+    .dest-header {
+      max-width: 1100px; margin: 0 auto 3rem;
+      display: flex; align-items: flex-end; justify-content: space-between;
+    }
+    .dest-grid {
+      max-width: 1100px; margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    .dest-card {
+      border-radius: 12px; overflow: hidden;
+      background: var(--white);
+      box-shadow: 0 4px 24px rgba(0,0,0,.06);
+      transition: transform .4s cubic-bezier(.16,1,.3,1), box-shadow .4s;
+      cursor: pointer;
+    }
+    .dest-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 16px 48px rgba(0,0,0,.12);
+    }
+    .dest-img {
+      height: 200px; position: relative; overflow: hidden;
+    }
+    .dest-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .dest-img .bg-art {
+      width: 100%; height: 100%;
+      transition: transform .6s cubic-bezier(.16,1,.3,1);
+    }
+    .dest-card:hover .bg-art { transform: scale(1.06); }
+
+    .feature-img,
+    .adventure-img {
+      height: 200px;
+      overflow: hidden;
+    }
+
+    .feature-img img,
+    .adventure-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .dest-flag {
+      position: absolute; top: .75rem; right: .75rem;
+      background: rgba(255,255,255,.9);
+      font-size: .75rem; padding: .25rem .6rem;
+      border-radius: 20px; backdrop-filter: blur(4px);
+      font-weight: 500;
+    }
+    .dest-body { padding: 1.2rem 1.4rem; }
+    .dest-stars { color: var(--gold); font-size: .85rem; margin-bottom: .5rem; }
+    .dest-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem; font-weight: 700; margin-bottom: .35rem;
+    }
+    .dest-desc { font-size: .85rem; color: var(--mist); line-height: 1.6; margin-bottom: 1rem; }
+    .btn-book {
+      display: inline-flex; align-items: center; gap: .5rem;
+      padding: .55rem 1.2rem; background: var(--ink);
+      color: var(--white); border: none; border-radius: 4px;
+      font-size: .8rem; font-weight: 600; cursor: pointer;
+      letter-spacing: .06em; text-transform: uppercase;
+      transition: background .3s;
+    }
+    .btn-book:hover { background: var(--terra); }
+    .btn-book i { font-size: .65rem; transition: transform .3s; }
+    .dest-card:hover .btn-book i { transform: translateX(3px); }
+
+    /* ─── ABOUT / VALUE ─── */
+    .about-section { background: var(--ink); color: var(--white); }
+    .about-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center;
+    }
+    .about-text .section-label { color: var(--gold); }
+    .about-text .section-title { color: var(--white); margin-bottom: 1.4rem; }
+    .about-text p { color: rgba(255,255,255,.6); line-height: 1.8; margin-bottom: 2rem; }
+
+    .perks-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem;
+    }
+    .perk {
+      padding: 1.4rem; border: 1px solid rgba(255,255,255,.08);
+      border-radius: 10px; transition: border-color .3s, background .3s;
+    }
+    .perk:hover { border-color: var(--terra); background: rgba(196,113,74,.06); }
+    .perk-icon { font-size: 1.4rem; margin-bottom: .7rem; color: var(--gold); }
+    .perk h4 { font-weight: 600; margin-bottom: .3rem; font-size: .95rem; }
+    .perk p { font-size: .82rem; color: rgba(255,255,255,.5); line-height: 1.6; }
+
+    /* ─── ABOUT VISUAL — IMAGE CARDS ─── */
+    .about-visual {
+      position: relative; height: 520px;
+    }
+
+    .vis-card {
+      position: absolute; border-radius: 16px; overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,.5);
+    }
+
+    /* vis-main: large card top-right */
+    .vis-main {
+      width: 78%; height: 400px; top: 0; right: 0;
+    }
+    .vis-main .vis-img {
+      position: absolute; inset: 0;
+      background-image: url('img/Eko.jpg');
+      background-size: cover; background-position: center;
+      transition: transform .6s ease;
+    }
+    .vis-main:hover .vis-img { transform: scale(1.04); }
+    .vis-main .vis-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(160deg, rgba(45,110,110,.25) 0%, rgba(26,58,42,.6) 60%, rgba(196,113,74,.3) 100%);
+    }
+
+    /* vis-accent: small card bottom-left */
+    .vis-accent {
+      width: 52%; height: 220px; bottom: 0; left: 0; z-index: 2;
+    }
+    .vis-accent .vis-img {
+      position: absolute; inset: 0;
+      background-image: url('img/link bridge.jpg');
+      background-size: cover; background-position: center;
+      transition: transform .6s ease;
+    }
+    .vis-accent:hover .vis-img { transform: scale(1.04); }
+    .vis-accent .vis-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(201,168,76,.2) 0%, rgba(181,96,61,.5) 60%, rgba(14,14,14,.7) 100%);
+    }
+
+    /* label on top of overlay */
+    .vis-label {
+      position: absolute; bottom: 1rem; left: 1rem; z-index: 2;
+      font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 900;
+      color: rgba(255,255,255,.3); letter-spacing: -.02em; line-height: 1;
+      pointer-events: none;
+    }
+
+    /* decorative SVG on vis-main */
+    .vis-main .vis-deco {
+      position: absolute; top: 20px; right: 20px; z-index: 2;
+      opacity: .18; pointer-events: none;
+    }
+
+    /* stat badge on vis-accent */
+    .vis-accent .vis-stat {
+      position: absolute; top: 1rem; right: 1rem; z-index: 2;
+      background: rgba(255,255,255,.12);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 8px;
+      padding: .5rem .8rem;
+      text-align: center;
+    }
+    .vis-stat .stat-big {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; font-weight: 900; color: #fff; line-height: 1;
+    }
+    .vis-stat .stat-tiny {
+      font-size: .65rem; font-weight: 600; letter-spacing: .1em;
+      text-transform: uppercase; color: rgba(255,255,255,.5);
+      margin-top: .2rem;
+    }
+
+    /* stats row */
+    .stats-row {
+      display: flex; gap: 2.5rem; margin-top: 2rem; padding-top: 2rem;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+    .stat-num {
+      font-family: 'Playfair Display', serif; font-size: 2.2rem;
+      font-weight: 900; color: var(--white); line-height: 1;
+    }
+    .stat-label { font-size: .78rem; color: var(--mist); letter-spacing: .06em; text-transform: uppercase; margin-top: .2rem; }
+
+    /* ─── TOP PICKS ─── */
+    .picks-section { background: var(--cream); }
+    .picks-inner { max-width: 1100px; margin: 0 auto; }
+    .picks-header { margin-bottom: 3rem; }
+    .picks-scroll {
+      display: flex; gap: 1.5rem; overflow-x: auto;
+      padding-bottom: 1rem; scrollbar-width: none;
+    }
+    .picks-scroll::-webkit-scrollbar { display: none; }
+    .pick-card {
+      min-width: 300px; border-radius: 16px; overflow: hidden;
+      position: relative; cursor: pointer;
+      box-shadow: 0 8px 32px rgba(0,0,0,.1);
+      transition: transform .4s cubic-bezier(.16,1,.3,1);
+    }
+    .pick-card:hover { transform: translateY(-6px) scale(1.01); }
+    .pick-bg {
+      height: 380px; position: relative;
+    }
+    .pick-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,.7) 0%, rgba(0,0,0,.1) 60%, transparent 100%);
+    }
+    .pick-content {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 1.5rem; color: var(--white);
+    }
+    .pick-num {
+      font-size: .7rem; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: .4rem; font-weight: 600;
+    }
+    .pick-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 700; line-height: 1.1; margin-bottom: .5rem;
+    }
+    .pick-desc { font-size: .82rem; color: rgba(255,255,255,.7); line-height: 1.6; }
+
+    /* ─── BLOG ─── */
+    .blog-section { background: var(--sand); }
+    .blog-inner { max-width: 1100px; margin: 0 auto; }
+    .blog-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 3rem;
+    }
+    .blog-card {
+      background: var(--white); border-radius: 12px; overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,.06);
+      transition: transform .3s, box-shadow .3s; cursor: pointer;
+    }
+    .blog-card:hover { transform: translateY(-5px); box-shadow: 0 12px 40px rgba(0,0,0,.1); }
+    .blog-img {
+      height: 180px;
+      overflow: hidden;
+    }
+    .blog-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .blog-body { padding: 1.4rem; }
+    .blog-tag {
+      display: inline-block; font-size: .7rem; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--terra); background: rgba(196,113,74,.1);
+      padding: .2rem .7rem; border-radius: 20px; margin-bottom: .8rem;
+    }
+    .blog-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem; font-weight: 700; line-height: 1.4; margin-bottom: .8rem;
+    }
+    .blog-meta { font-size: .78rem; color: var(--mist); display: flex; gap: 1rem; align-items: center; }
+
+    /* ─── TESTIMONIAL ─── */
+    .testimonial-section { background: var(--cream); text-align: center; }
+    .testimonial-inner { max-width: 700px; margin: 0 auto; }
+    .quote-mark {
+      font-family: 'Playfair Display', serif;
+      font-size: 8rem; line-height: .6;
+      color: var(--terra); opacity: .2; margin-bottom: -.5rem;
+      display: block;
+    }
+    .testimonial-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.3rem, 3vw, 2rem); font-style: italic;
+      font-weight: 400; line-height: 1.6; color: var(--ink);
+      margin-bottom: 2rem;
+    }
+    .testimonial-avatar {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--terra), var(--gold));
+      margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700;
+      color: var(--white);
+    }
+    .stars { color: var(--gold); font-size: 1rem; margin-bottom: .4rem; }
+    .reviewer-name { font-weight: 600; font-size: .9rem; }
+    .reviewer-role { font-size: .8rem; color: var(--mist); }
+
+    /* ─── CONTACT CTA ─── */
+    .contact-section { background: var(--ink); position: relative; overflow: hidden; }
+    .contact-section::before {
+      content: ''; position: absolute;
+      top: -50%; left: -20%; width: 60%; height: 200%;
+      background: radial-gradient(ellipse, rgba(196,113,74,.15) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .contact-inner {
+      max-width: 680px; margin: 0 auto; text-align: center; position: relative; z-index: 2;
+    }
+    .contact-inner .section-label { color: var(--gold); }
+    .contact-inner .section-title { color: var(--white); margin-bottom: 1rem; }
+    .contact-inner p { color: rgba(255,255,255,.6); line-height: 1.8; margin-bottom: 2.5rem; }
+    .email-form {
+      display: flex; gap: 0; max-width: 480px; margin: 0 auto;
+      border: 1.5px solid rgba(255,255,255,.15); border-radius: 8px; overflow: hidden;
+      transition: border-color .3s;
+    }
+    .email-form:focus-within { border-color: var(--terra); }
+    .email-form input {
+      flex: 1; padding: 1rem 1.4rem; background: rgba(255,255,255,.05);
+      border: none; outline: none; color: var(--white);
+      font-family: 'DM Sans', sans-serif; font-size: .9rem;
+    }
+    .email-form input::placeholder { color: rgba(255,255,255,.3); }
+    .email-form button {
+      padding: 1rem 1.8rem; background: var(--terra); border: none;
+      color: var(--white); font-size: .85rem; font-weight: 700;
+      cursor: pointer; letter-spacing: .06em; text-transform: uppercase;
+      transition: background .3s;
+    }
+    .email-form button:hover { background: #b5603d; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: #050505; color: rgba(255,255,255,.55);
+      padding: 1.4rem 2rem;
+      border-top: 1px solid rgba(255,255,255,.06);
+    }
+    .footer-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem; font-weight: 900; color: var(--white);
+    }
+    .footer-links { display: flex; gap: 1.8rem; list-style: none; flex-wrap: wrap; }
+    .footer-links a { font-size: .78rem; color: rgba(255,255,255,.4); text-decoration: none; transition: color .3s; letter-spacing: .03em; }
+    .footer-links a:hover { color: var(--terra); }
+    .footer-copy { font-size: .75rem; color: rgba(255,255,255,.25); }
+    .socials { display: flex; gap: .6rem; }
+    .social-btn {
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.1);
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,.4); font-size: .75rem; cursor: pointer;
+      transition: border-color .3s, color .3s;
+    }
+    .social-btn:hover { border-color: var(--terra); color: var(--terra); }
+
+    /* ─── REVEAL ANIMATIONS ─── */
+    .reveal { opacity: 0; transform: translateY(30px); }
+    .reveal-left { opacity: 0; transform: translateX(-40px); }
+    .reveal-right { opacity: 0; transform: translateX(40px); }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      .search-box { grid-template-columns: 1fr 1fr; }
+      .dest-grid { grid-template-columns: 1fr 1fr; }
+      .about-inner { grid-template-columns: 1fr; gap: 3rem; }
+      .blog-grid { grid-template-columns: 1fr 1fr; }
+      .footer-inner { grid-template-columns: 1fr 1fr; }
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+    }
+    @media (max-width: 580px) {
+      .dest-grid { grid-template-columns: 1fr; }
+      .blog-grid { grid-template-columns: 1fr; }
+      .search-box { grid-template-columns: 1fr; }
+      .footer-inner { grid-template-columns: 1fr; }
+      .search-divider { display: none; }
+    }
+  </style>
 </head>
-<body class="bg-white text-gray-800">
+<body>
 
-  <!-- Hero with background that covers header too -->
-  <section class="relative w-full h-[100vh] flex flex-col">
-    
-    <!-- Background Image -->
-    <div class="absolute inset-0">
-      <img src="img/MainHerobg.jpg" 
-           alt="Background" 
-           class="w-full h-full object-cover hero-bg">
-    </div>
-    
-    <!-- Overlay -->
-    <div class="absolute inset-0 bg-black/40"></div>
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursor-ring"></div>
 
-    <!-- Header sits ON TOP of hero -->
-    <header class="relative z-20 flex flex-wrap justify-between items-center px-4 md:px-8 py-4 border-b border-transparent">
-      <h1 class="text-2xl font-bold text-white">TraveMe</h1>
-      <nav class="flex flex-wrap gap-4 md:space-x-8 text-white font-medium mt-2 md:mt-0">
-        <a href="#" class="hover:text-gray-200">Destination</a>
-        <a href="#" class="hover:text-gray-200">Package</a>
-        <a href="#" class="hover:text-gray-200">Pricing</a>
-        <a href="#" class="hover:text-gray-200">About Us</a>
-      </nav>
-      <div class="flex items-center space-x-3">
-        <!-- Language Switcher -->
-        <div id="lang-switch"
-             class="relative w-28 h-9 rounded-md border border-white/70 overflow-hidden cursor-pointer select-none flex">
-          <!-- Static labels (always visible underneath) -->
-          <div class="w-1/2 flex items-center justify-center text-white font-semibold text-[11px]">EN</div>
-          <div class="w-1/2 flex items-center justify-center text-white font-semibold text-[11px]">ES</div>
-
-          <!-- Transparent slider "window" -->
-          <div id="lang-slider"
-               class="absolute top-0 left-0 w-1/2 h-full border-r border-l border-white rounded-md transition-transform duration-300">
-          </div>
-        </div>
-
-        <!-- Login Button -->
-        <button class="px-4 py-2 border border-white text-white rounded-lg hover:bg-white hover:text-black transition">
-          Log in
-        </button>
-
-        <!-- Register Button -->
-        <button class="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition">
-          Register
-        </button>
+  <!-- ─── NAV ─── -->
+  <nav id="main-nav">
+    <div class="nav-logo">TraveMe</div>
+    <ul class="nav-links">
+      <li><a href="#" data-i18n="nav_dest">Destinations</a></li>
+      <li><a href="#" data-i18n="nav_pkg">Packages</a></li>
+      <li><a href="#" data-i18n="nav_price">Pricing</a></li>
+      <li><a href="#" data-i18n="nav_about">About</a></li>
+    </ul>
+    <div class="nav-actions">
+      <div class="lang-pill" id="lang-pill">
+        <span class="active" id="lang-en">EN</span>
+        <span id="lang-es">ES</span>
       </div>
-    </header>
+      <button class="btn-login" data-i18n="login">Log in</button>
+      <button class="btn-register" data-i18n="register">Register</button>
+    </div>
+  </nav>
 
-    <!-- Hero Content -->
-    <div class="relative z-10 flex flex-1 items-center justify-center text-center text-white px-6">
-      <div class="max-w-2xl">
-        <h2 class="text-3xl md:text-5xl font-extrabold">Easy Trips, More Fun.</h2>
-        <p class="mt-4 text-base md:text-lg">Discover a new way to travel that's fun, easy, and stress-free. Turn your dream destinations into unforgettable realities.</p>
-        <button class="mt-6 px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800">See More</button>
+  <!-- ─── HERO ─── -->
+  <section class="hero" id="hero">
+    <div class="hero-bg" id="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div id="particles"></div>
+
+    <div class="hero-content">
+      <span class="hero-eyebrow" id="hero-eyebrow" data-i18n="hero_eyebrow">✦ Discover the World</span>
+      <h1 class="hero-title" id="hero-title">
+        <span data-i18n="hero_title1">Easy Trips,</span><br><em data-i18n="hero_title2">More Fun.</em>
+      </h1>
+      <p class="hero-sub" id="hero-sub" data-i18n="hero_sub">Discover a new way to travel — effortless, exciting, and unforgettable. Turn your dream destinations into living memories.</p>
+      <div class="hero-cta" id="hero-cta">
+        <button class="btn-primary" data-i18n="hero_cta1">Explore Now <i class="fas fa-arrow-right" style="margin-left:.5rem;font-size:.75rem"></i></button>
+        <button class="btn-ghost" data-i18n="hero_cta2">Watch Film</button>
       </div>
     </div>
 
-    <!-- Hero Navigation Arrows -->
-    <button id="prev-hero" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-3xl z-30 bg-black/40 rounded-full p-2 hover:bg-black/70">
-      &#10094;
-    </button>
-    <button id="next-hero" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-3xl z-30 bg-black/40 rounded-full p-2 hover:bg-black/70">
-      &#10095;
-    </button>
-  </section>
+    <button class="hero-arrow" id="prev-hero"><i class="fas fa-chevron-left"></i></button>
+    <button class="hero-arrow" id="next-hero"><i class="fas fa-chevron-right"></i></button>
 
-  <!-- Search Section -->
-  <section class="max-w-5xl mx-auto px-6 py-10">
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 bg-white/90 shadow-lg p-6 rounded-xl">
-      <div class="relative flex items-center">
-        <img src="img/location_pin_002.jpg" alt="Location Icon" class="absolute left-3 w-5 h-5">
-        <input type="text" placeholder="City or address" class="border p-3 rounded-lg w-full pl-10">
-      </div>
-      <div class="relative flex items-center">
-        <!-- Calendar Icon -->
-        <svg class="absolute left-3 w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7H3v12a2 2 0 002 2z"/>
-        </svg>
-        <input type="date" class="border p-3 rounded-lg w-full pl-10">
-      </div>
-      <select class="border p-3 rounded-lg w-full">
-        <option>Landscape Type</option>
-        <option>City</option>
-        <option>Desert</option>
-        <option>Beach</option>
-      </select>
-      <div id="search-container" class="relative">
-        <button id="search-btn" class="bg-black text-white rounded-lg px-4 py-3 hover:bg-gray-800 w-full">Search</button>
-        <input id="custom-search" class="input hidden absolute inset-0 w-full" name="text" placeholder="Search..." type="search">
-      </div>
+    <div class="hero-dots" id="hero-dots"></div>
+
+    <div class="scroll-hint">
+      <span id="scroll-hint-text">Scroll</span>
+      <div class="scroll-line"></div>
     </div>
   </section>
 
-  <!-- Recommended Destinations Section -->
-  <section class="max-w-6xl mx-auto px-6 py-12">
-    <h3 class="text-2xl font-bold mb-6 text-white">Recommended Destinations</h3>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      
-      <!-- Destination Card -->
-      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-        <!-- Image placeholder -->
-        <div class="relative h-40 bg-gray-300">
-          <span class="absolute top-2 right-2 bg-white text-xs px-2 py-1 rounded shadow">🇦🇺 Australia</span>
-          <img src="img/Australia.jpg" alt="Destination Image" class="w-full h-full object-cover">
+  <!-- ─── SEARCH ─── -->
+  <div class="search-section" id="search-section">
+    <div class="search-box">
+      <div class="search-field">
+        <label data-i18n="search_dest">Destination</label>
+        <input type="text" id="search-dest-input" data-i18n-placeholder="search_dest_ph">
+      </div>
+      <div class="search-divider"></div>
+      <div class="search-field date-field" id="date-field">
+        <label data-i18n="date_label">Travel Date</label>
+        <div class="date-display" id="date-display">
+          <i class="fas fa-calendar cal-icon"></i>
+          <span class="date-val placeholder" id="date-val" data-i18n-placeholder="date_placeholder">Pick a date</span>
         </div>
-        <!-- Content -->
-        <div class="p-4">
-          <!-- Review -->
-          <div class="flex items-center text-yellow-500 text-sm mb-2">
-            ★★★★☆ <span class="ml-2 text-gray-600">4.5</span>
+        <div class="cal-popup" id="cal-popup">
+          <div class="cal-header">
+            <button class="cal-nav" id="cal-prev"><i class="fas fa-chevron-left"></i></button>
+            <span class="cal-month-label" id="cal-month-label"></span>
+            <button class="cal-nav" id="cal-next"><i class="fas fa-chevron-right"></i></button>
           </div>
-          <!-- Name and Bio -->
-          <h4 class="font-bold text-lg">Whitehaven Beach</h4>
-          <p class="text-gray-600 text-sm mt-1">A tropical paradise famous for its pure white sands and crystal clear waters.</p>
-          <!-- Book Now -->
-          <button class="mt-4 px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700">Book Now</button>
+          <div class="cal-weekdays">
+            <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+          </div>
+          <div class="cal-days" id="cal-days"></div>
+          <button class="cal-confirm" id="cal-confirm">Confirm</button>
+        </div>
+      </div>
+      <div class="search-divider"></div>
+      <div class="search-field">
+        <label data-i18n="landscape_label">Landscape</label>
+        <select id="landscape-select">
+          <option value="" data-i18n="landscape_any">Any type</option>
+          <option data-i18n="landscape_city">City</option>
+          <option data-i18n="landscape_desert">Desert</option>
+          <option data-i18n="landscape_beach">Beach</option>
+          <option data-i18n="landscape_mountain">Mountain</option>
+        </select>
+      </div>
+      <button class="btn-search" data-i18n="search_btn">Search <i class="fas fa-search" style="margin-left:.4rem"></i></button>
+    </div>
+  </div>
+
+  <!-- ─── DESTINATIONS ─── -->
+  <section class="destinations" style="padding-top:5rem">
+    <div class="dest-header">
+      <div>
+        <p class="section-label" id="dest-section-label">Curated for You</p>
+        <h2 class="section-title" id="dest-section-heading">Recommended<br>Destinations</h2>
+      </div>
+      <a href="#" id="view-all-link" style="font-size:.85rem;font-weight:600;color:var(--terra);text-decoration:none;letter-spacing:.04em">
+        View All <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+    <div class="dest-grid" id="dest-grid">
+
+      <div class="dest-card reveal">
+        <div class="dest-img">
+          <img src="img/Australia.jpg" alt="Whitehaven Beach">
+        </div>
+        <span class="dest-flag">🇦🇺 Australia</span>
+        <div class="dest-body">
+          <div class="dest-stars">★★★★☆ <span style="color:var(--ink);font-size:.8rem;margin-left:.3rem">4.5</span></div>
+          <div class="dest-name">Whitehaven Beach</div>
+          <p class="dest-desc">A tropical paradise famous for its pure white sands and crystal clear turquoise waters.</p>
+          <button class="btn-book"><span class="btn-book-text">Book Now</span> <i class="fas fa-arrow-right"></i></button>
         </div>
       </div>
 
-      <!-- Duplicate for more destinations -->
-      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div class="relative h-40 bg-gray-300">
-          <span class="absolute top-2 right-2 bg-white text-xs px-2 py-1 rounded shadow">🇨🇭 Switzerland</span>
-          <img src="img/Switzerland.jpg" alt="Destination Image" class="w-full h-full object-cover">
+      <div class="dest-card reveal">
+        <div class="dest-img">
+          <img src="img/Switzerland.jpg" alt="Lake Lucerne">
         </div>
-        <div class="p-4">
-          <div class="flex items-center text-yellow-500 text-sm mb-2">
-            ★★★★☆ <span class="ml-2 text-gray-600">4.7</span>
-          </div>
-          <h4 class="font-bold text-lg">Lake Lucerne</h4>
-          <p class="text-gray-600 text-sm mt-1">Enjoy a serene picnic by the stunning Swiss lake surrounded by mountains.</p>
-          <button class="mt-4 px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700">Book Now</button>
+        <span class="dest-flag">🇨🇭 Switzerland</span>
+        <div class="dest-body">
+          <div class="dest-stars">★★★★★ <span style="color:var(--ink);font-size:.8rem;margin-left:.3rem">4.7</span></div>
+          <div class="dest-name">Lake Lucerne</div>
+          <p class="dest-desc">Enjoy a serene picnic by the stunning Swiss lake surrounded by snow-capped mountains.</p>
+          <button class="btn-book"><span class="btn-book-text">Book Now</span> <i class="fas fa-arrow-right"></i></button>
         </div>
       </div>
 
-      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div class="relative h-40 bg-gray-300">
-          <span class="absolute top-2 right-2 bg-white text-xs px-2 py-1 rounded shadow">🇻🇪 Venezuela</span>
-          <img src="img/Venzuela.jpg" alt="Destination Image" class="w-full h-full object-cover">
+      <div class="dest-card reveal">
+        <div class="dest-img">
+          <img src="img/Venzuela.jpg" alt="Angel Falls">
         </div>
-        <div class="p-4">
-          <div class="flex items-center text-yellow-500 text-sm mb-2">
-            ★★★★☆ <span class="ml-2 text-gray-600">4.6</span>
-          </div>
-          <h4 class="font-bold text-lg">Angel Falls</h4>
-          <p class="text-gray-600 text-sm mt-1">Witness the world's highest uninterrupted waterfall deep in the Venezuelan jungle.</p>
-          <button class="mt-4 px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700">Book Now</button>
+        <span class="dest-flag">🇻🇪 Venezuela</span>
+        <div class="dest-body">
+          <div class="dest-stars">★★★★☆ <span style="color:var(--ink);font-size:.8rem;margin-left:.3rem">4.6</span></div>
+          <div class="dest-name">Angel Falls</div>
+          <p class="dest-desc">Witness the world's highest uninterrupted waterfall deep in the Venezuelan jungle.</p>
+          <button class="btn-book"><span class="btn-book-text">Book Now</span> <i class="fas fa-arrow-right"></i></button>
         </div>
       </div>
 
-      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div class="relative h-40 bg-gray-300">
-          <span class="absolute top-2 right-2 bg-white text-xs px-2 py-1 rounded shadow">🇫🇷 France</span>
-          <img src="img/snailpeople.jpg" alt="Louvre Museum" class="w-full h-full object-cover">
+      <div class="dest-card reveal">
+        <div class="dest-img">
+          <img src="img/snailpeople.jpg" alt="The Louvre">
         </div>
-        <div class="p-4">
-          <div class="flex items-center text-yellow-500 text-sm mb-2">
-            ★★★★☆ <span class="ml-2 text-gray-600">4.8</span>
-          </div>
-          <h4 class="font-bold text-lg">The Louvre</h4>
-          <p class="text-gray-600 text-sm mt-1">Explore the world's largest art museum and historic monument in the heart of Paris.</p>
-          <button class="mt-4 px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700">Book Now</button>
+        <span class="dest-flag">🇫🇷 France</span>
+        <div class="dest-body">
+          <div class="dest-stars">★★★★★ <span style="color:var(--ink);font-size:.8rem;margin-left:.3rem">4.8</span></div>
+          <div class="dest-name">The Louvre</div>
+          <p class="dest-desc">Explore the world's largest art museum and historic monument in the heart of Paris.</p>
+          <button class="btn-book"><span class="btn-book-text">Book Now</span> <i class="fas fa-arrow-right"></i></button>
         </div>
       </div>
 
-      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div class="relative h-40 bg-gray-300">
-          <span class="absolute top-2 right-2 bg-white text-xs px-2 py-1 rounded shadow">🇲🇽 Mexico</span>
-          <img src="img/Aztec.jpg" alt="Chichen Itza" class="w-full h-full object-cover">
+      <div class="dest-card reveal">
+        <div class="dest-img">
+          <img src="img/Aztec.jpg" alt="Chichen Itza">
         </div>
-        <div class="p-4">
-          <div class="flex items-center text-yellow-500 text-sm mb-2">
-            ★★★★☆ <span class="ml-2 text-gray-600">4.9</span>
-          </div>
-          <h4 class="font-bold text-lg">Chichen Itza</h4>
-          <p class="text-gray-600 text-sm mt-1">Visit the ancient Mayan city and marvel at the iconic El Castillo pyramid in Mexico.</p>
-          <button class="mt-4 px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700">Book Now</button>
+        <span class="dest-flag">🇲🇽 Mexico</span>
+        <div class="dest-body">
+          <div class="dest-stars">★★★★★ <span style="color:var(--ink);font-size:.8rem;margin-left:.3rem">4.9</span></div>
+          <div class="dest-name">Chichen Itza</div>
+          <p class="dest-desc">Visit the ancient Mayan city and marvel at the iconic El Castillo pyramid.</p>
+          <button class="btn-book"><span class="btn-book-text">Book Now</span> <i class="fas fa-arrow-right"></i></button>
         </div>
       </div>
 
-      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div class="relative h-40 bg-gray-300">
-          <span class="absolute top-2 right-2 bg-white text-xs px-2 py-1 rounded shadow">🇮🇹 Italy</span>
-          <img src="img/Pisa.jpg" alt="Leaning Tower of Pisa" class="w-full h-full object-cover">
+      <div class="dest-card reveal">
+        <div class="dest-img">
+          <img src="img/Pisa.jpg" alt="Leaning Tower of Pisa">
         </div>
-        <div class="p-4">
-          <div class="flex items-center text-yellow-500 text-sm mb-2">
-            ★★★★☆ <span class="ml-2 text-gray-600">4.7</span>
-          </div>
-          <h4 class="font-bold text-lg">Leaning Tower of Pisa</h4>
-          <p class="text-gray-600 text-sm mt-1">Marvel at the iconic Leaning Tower of Pisa, a world-famous architectural wonder in Italy.</p>
-          <button class="mt-4 px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700">Book Now</button>
+        <span class="dest-flag">🇮🇹 Italy</span>
+        <div class="dest-body">
+          <div class="dest-stars">★★★★☆ <span style="color:var(--ink);font-size:.8rem;margin-left:.3rem">4.7</span></div>
+          <div class="dest-name">Leaning Tower of Pisa</div>
+          <p class="dest-desc">Marvel at the iconic Leaning Tower of Pisa, a world-famous architectural wonder.</p>
+          <button class="btn-book"><span class="btn-book-text">Book Now</span> <i class="fas fa-arrow-right"></i></button>
         </div>
       </div>
 
     </div>
   </section>
-<script>
-  (function () {
-    const box = document.getElementById('lang-switch');
-    const slider = document.getElementById('lang-slider');
-    let isES = false;
 
-    box.addEventListener('click', () => {
-      isES = !isES;
-      slider.style.transform = isES ? 'translateX(100%)' : 'translateX(0%)';
-    });
-  }());
+  <!-- ─── ABOUT / VALUE ─── -->
+  <section class="about-section">
+    <div class="about-inner">
+      <div class="about-text reveal-left">
+        <p class="section-label" id="why-label">Why Choose Us</p>
+        <h2 class="section-title" id="why-heading">Elevate Your<br>Adventures</h2>
+        <p id="why-body" style="margin-top:1.2rem">At TraveMe, we believe every journey should be effortless, exciting, and unforgettable. We go beyond booking — we craft experiences that change the way you see the world.</p>
 
-  const searchBtn = document.getElementById('search-btn');
-  const customSearch = document.getElementById('custom-search');
-  const searchContainer = document.getElementById('search-container');
+        <div class="perks-grid" style="margin-top:2rem">
+          <div class="perk">
+            <div class="perk-icon"><i class="fas fa-user-tie"></i></div>
+            <h4 id="perk1-title">Expert Guides</h4>
+            <p id="perk1-body">Local experts who bring destinations to life with stories and secrets.</p>
+          </div>
+          <div class="perk">
+            <div class="perk-icon"><i class="fas fa-water"></i></div>
+            <h4 id="perk2-title">Diving & Snorkeling</h4>
+            <p id="perk2-body">Unforgettable underwater adventures in the world's most stunning reefs.</p>
+          </div>
+          <div class="perk">
+            <div class="perk-icon"><i class="fas fa-camera"></i></div>
+            <h4 id="perk3-title">Memorable Moments</h4>
+            <p id="perk3-body">Trips designed to create stories that last a lifetime.</p>
+          </div>
+          <div class="perk">
+            <div class="perk-icon"><i class="fas fa-star"></i></div>
+            <h4 id="perk4-title">Seamless Comfort</h4>
+            <p id="perk4-body">Premium travel logistics handled so you can focus on exploring.</p>
+          </div>
+        </div>
 
-  searchBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    searchBtn.classList.add('hidden');
-    customSearch.classList.remove('hidden');
-    customSearch.focus();
-  });
+        <div class="stats-row">
+          <div class="stat-item">
+            <div class="stat-num" data-count="12000">0</div>
+            <div class="stat-label" id="stat1-label">Happy Travelers</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num" data-count="86">0</div>
+            <div class="stat-label" id="stat2-label">Destinations</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num" data-count="98">0</div>
+            <div class="stat-label" id="stat3-label">% Satisfaction</div>
+          </div>
+        </div>
+      </div>
 
-  // Revert back when pressing Enter or clicking outside
-  customSearch.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      customSearch.classList.add('hidden');
-      searchBtn.classList.remove('hidden');
-    }
-  });
+      <!-- ─── ABOUT VISUAL: IMAGE CARDS ─── -->
+      <div class="about-visual reveal-right">
 
-  document.addEventListener('click', (e) => {
-    if (!searchContainer.contains(e.target)) {
-      customSearch.classList.add('hidden');
-      searchBtn.classList.remove('hidden');
-    }
-  });
+        <!-- Main large card — swap background-image to your own photo -->
+        <div class="vis-card vis-main">
+          <div class="vis-img"></div>
+          <div class="vis-overlay"></div>
+          <div class="vis-label">Explore<br>Beyond</div>
+          <svg class="vis-deco" width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="55" stroke="white" stroke-width="1" fill="none"/>
+            <circle cx="60" cy="60" r="40" stroke="white" stroke-width="1" fill="none"/>
+            <circle cx="60" cy="60" r="25" stroke="white" stroke-width="1" fill="none"/>
+          </svg>
+        </div>
 
-  const heroBg = document.querySelector(".hero-bg");
-  const heroImages = [
-    "img/MainHerobg.jpg",
-    "img/Australia.jpg",
-    "img/Switzerland.jpg",
-    "img/Aztec.jpg",
-    "img/snailpeople.jpg",
-    "img/Venzuela.jpg",
-    "img/Pisa.jpg",
-    "img/Mount-Fuji.jpg",
-    "img/GGB.jpg",
-    
+        <!-- Accent small card — swap background-image to your own photo -->
+        <div class="vis-card vis-accent">
+          <div class="vis-img"></div>
+          <div class="vis-overlay"></div>
+          <div class="vis-label">12K+<br>Trips</div>
+          <div class="vis-stat">
+            <div class="stat-big">★ 4.9</div>
+            <div class="stat-tiny">Rating</div>
+          </div>
+        </div>
 
-  ];
-  let currentHero = 0;
+        <!-- Floating gold badge -->
+        <div style="position:absolute;top:2rem;left:-1.5rem;background:var(--gold);color:var(--ink);padding:.7rem 1.2rem;border-radius:8px;font-weight:700;font-size:.85rem;box-shadow:0 8px 24px rgba(201,168,76,.4);z-index:3">
+          ★ 4.9/5 Rating
+        </div>
 
-  function updateHero() {
-    heroBg.src = heroImages[currentHero];
-  }
+      </div>
+    </div>
+  </section>
 
-  document.getElementById("prev-hero").addEventListener("click", () => {
-    currentHero = (currentHero - 1 + heroImages.length) % heroImages.length;
-    updateHero();
-  });
+  <!-- ─── TOP PICKS ─── -->
+  <section class="picks-section">
+    <div class="picks-inner">
+      <div class="picks-header reveal">
+        <p class="section-label" id="picks-label">Handpicked for You</p>
+        <h2 class="section-title" id="picks-heading">Where Comfort Meets<br>Convenience</h2>
+      </div>
+      <div class="picks-scroll">
+        <div class="pick-card">
+          <div class="feature-img">
+            <img src="img/Dam square.jpg" alt="Comfort Feature">
+          </div>
+          <div class="pick-content">
+            <div class="pick-num">— 001</div>
+            <div class="pick-name">Dam Square,<br>Amsterdam</div>
+            <p class="pick-desc">Royal heritage meets enchanting urban scenes at this iconic landmark.</p>
+          </div>
+        </div>
+        <div class="pick-card">
+          <div class="feature-img">
+            <img src="img/Mount-Fuji.jpg" alt="Comfort Feature">
+          </div>
+          <div class="pick-content">
+            <div class="pick-num">— 002</div>
+            <div class="pick-name">Mount Fuji,<br>Japan</div>
+            <p class="pick-desc">Japan's iconic snow-capped peak offers breathtaking sunrise panoramas.</p>
+          </div>
+        </div>
+        <div class="pick-card">
+          <div class="feature-img">
+            <img src="img/GGB.jpg" alt="Comfort Feature">
+          </div>
+          <div class="pick-content">
+            <div class="pick-num">— 003</div>
+            <div class="pick-name">Golden Gate,<br>San Francisco</div>
+            <p class="pick-desc">Engineering marvel stretching across the shimmering San Francisco Bay.</p>
+          </div>
+        </div>
+        <div class="pick-card">
+          <div class="feature-img">
+            <img src="img/Eko Atlantic.jpg" alt="Comfort Feature">
+          </div>
+          <div class="pick-content">
+            <div class="pick-num">— 004</div>
+            <div class="pick-name">Eko Atlantic,<br>Lagos</div>
+            <p class="pick-desc">Africa's newest city rising from the ocean — modern, bold, extraordinary.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  document.getElementById("next-hero").addEventListener("click", () => {
-    currentHero = (currentHero + 1) % heroImages.length;
-    updateHero();
-  });
-</script>
-<style>
-  .input {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid #ccc;
-    border-radius: 0.5rem;
-    font-size: 1rem;
-    outline: none;
-    transition: border-color 0.3s ease;
-  }
-  .input:focus {
-    border-color: #000;
-  }
-  .hidden {
-    display: none;
-  }
-</style>
-<style>
-  html, body {
-    overscroll-behavior: none;
-    overscroll-behavior-y: none;
-  }
-</style>
-</body>
-</html>s
-<style>
-.input-container {
-  position: relative;
-  display: flex;
-  height: 2.8rem;
-  width: 100%;
-  min-width: 200px;
-  max-width: 250px;
-  background-color: #cbcbcb;
-  border-radius: 8px;
-  box-shadow: 20px 20px 30px rgba(0, 0, 0, .05);
-}
+  <!-- ─── BLOG ─── -->
+  <section class="blog-section">
+    <div class="blog-inner">
+      <p class="section-label reveal" id="blog-label">Travel Stories</p>
+      <h2 class="section-title reveal" id="blog-heading" style="max-width:500px">Although A Picture Is Worth A Thousand Words</h2>
+      <div class="blog-grid">
+        <div class="blog-card reveal">
+          <div class="blog-img">
+            <img src="img/Boat.jpg" alt="Solo Travel">
+          </div>
+          <div class="blog-body">
+            <span class="blog-tag" id="blog-tag1">Traveling</span>
+            <h3 class="blog-title" id="blog-title1">5 Reasons Why Solo Travel Is the Best Gift You Can Give Yourself</h3>
+            <div class="blog-meta"><span>10 min read</span><span>12 Sep 2025</span></div>
+          </div>
+        </div>
+        <div class="blog-card reveal">
+          <div class="blog-img">
+            <img src="img/National Theatre.jpg" alt="Travel Destinations">
+          </div>
+          <div class="blog-body">
+            <span class="blog-tag" id="blog-tag2">Destinations</span>
+            <h3 class="blog-title" id="blog-title2">Underrated Travel Destinations You Should Visit This Year</h3>
+            <div class="blog-meta"><span>8 min read</span><span>20 Oct 2025</span></div>
+          </div>
+        </div>
+        <div class="blog-card reveal">
+          <div class="blog-img">
+            <img src="img/Ghana .jpg" alt="Weekend Getaway">
+          </div>
+          <div class="blog-body">
+            <span class="blog-tag" id="blog-tag3">Tips</span>
+            <h3 class="blog-title" id="blog-title3">How to Plan the Perfect Weekend Getaway Without the Stress</h3>
+            <div class="blog-meta"><span>6 min read</span><span>5 Nov 2025</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-.input-container input {
-  height: 100%;
-  width: 100%;
-  border-radius: 8px;
-  border: 1px solid  rgb(255, 255, 255);
-  background-color: transparent;
-  padding: 0.625rem 70px 0.625rem 0.75rem;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  font-weight: 400;
-  color: rgb(0, 0, 0);
-  outline: none;
-  transition: all .15s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.input-container input:focus {
-  border: 1px solid rgb(0, 0, 0);
-}
-
-.invite-btn {
-  position: absolute;
-  width: 65px;
-  right: 4px;
-  top: 4px;
-  bottom: 4px;
-  z-index: 10;
-  border-radius: 4px;
-  background-color:black;
-  color: #ffffff;
-  padding-top: .25rem;
-  padding-bottom: .25rem;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-  text-align: center;
-  vertical-align: middle;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  border: none;
-  transition: .6s ease;
-}
-
-.invite-btn:hover {
-  right: 2px;
-  top: 2px;
-  bottom: 2px;
-  border-radius: 8px;
-}
-
-.input-container input:placeholder-shown ~ .invite-btn {
-  pointer-events: none;
-  background-color: rgb(0, 0, 0);
-  opacity: 0.5;
-}
-</style>
-<!-- Agency Value Section -->
-<section class="max-w-6xl mx-auto px-6 py-16">
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-    
-    <!-- Left: Text & Bonuses -->
-    <div>
-      <h3 class="text-3xl font-bold text-gray-800 mb-4">Elevate your adventures</h3>
-      <p class="text-gray-600 mb-8">
-        At TraveMe, we believe every journey should be effortless, exciting, and unforgettable. 
-        That’s why we go beyond just booking trips — we craft experiences that elevate the way you see the world.
+  <!-- ─── TESTIMONIAL ─── -->
+  <section class="testimonial-section">
+    <div class="testimonial-inner">
+      <span class="quote-mark">"</span>
+      <p class="testimonial-text reveal" id="testimonial-text">
+        Traveling alone was something I used to fear, but it turned out to be the most empowering experience of my life.
       </p>
+      <div class="testimonial-avatar reveal">J</div>
+      <div class="stars reveal">★★★★★</div>
+      <p class="reviewer-name reveal">Jake Danielson</p>
+      <p class="reviewer-role" id="reviewer-role-el">Solo Traveler & Guest</p>
+    </div>
+  </section>
 
-      <!-- Bonuses Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div class="p-6 bg-white rounded-lg shadow">
-          <h4 class="font-semibold text-gray-800">Professional Tour Guides</h4>
-          <p class="text-sm text-gray-600 mt-1">Explore with experts who bring destinations to life.</p>
-        </div>
-        <div class="p-6 bg-white rounded-lg shadow">
-          <h4 class="font-semibold text-gray-800">Diving & Snorkeling</h4>
-          <p class="text-sm text-gray-600 mt-1">Unforgettable underwater adventures in stunning reefs.</p>
-        </div>
-        <div class="p-6 bg-white rounded-lg shadow">
-          <h4 class="font-semibold text-gray-800">Memorable Moments</h4>
-          <p class="text-sm text-gray-600 mt-1">Trips designed to create stories worth sharing.</p>
-        </div>
-        <div class="p-6 bg-white rounded-lg shadow">
-          <h4 class="font-semibold text-gray-800">Easy & Comfortable</h4>
-          <p class="text-sm text-gray-600 mt-1">Seamless travel with comfort every step of the way.</p>
-        </div>
+  <!-- ─── CONTACT CTA ─── -->
+  <section class="contact-section">
+    <div class="contact-inner">
+      <p class="section-label reveal" id="contact-label">Stay in Touch</p>
+      <h2 class="section-title reveal" id="contact-heading">Reach Out Anytime<br>For Travel Tips</h2>
+      <p class="reveal" id="contact-body">Whether you're planning your next adventure, need details about our services, or just want to chat about travel ideas — don't hesitate to reach out.</p>
+      <div class="email-form reveal">
+        <input type="email" placeholder="Your email address">
+        <button type="button" id="contact-submit">Submit</button>
       </div>
     </div>
+  </section>
 
-    <!-- Right: Image & Flag -->
-<div class="relative w-[450px] mx-auto lg:mx-0">
-  <!-- Main Image -->
-  <div class="h-[600px] bg-gray-300 rounded-lg overflow-hidden">
-    <img id="main-image" src="img/Eko.jpg" alt="Nigeria Travel" class="w-full h-full object-cover">
-  </div>
-  <!-- Nigerian Flag -->
-  <span class="absolute top-2 left-2 bg-white px-2 py-1 text-xs rounded shadow">🇳🇬 Nigeria</span>
-  <!-- Thumbnails -->
-  <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2 bg-white/80 px-2 py-1 rounded-lg shadow">
-    <div class="w-16 h-12 bg-gray-400 rounded overflow-hidden cursor-pointer">
-      <img src="img/National Theatre.jpg" alt="thumb" class="w-full h-full object-cover thumbnail">
+  <!-- ─── FOOTER ─── -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-logo">TraveMe</div>
+      <ul class="footer-links">
+        <li><a href="#" data-i18n="about">About</a></li>
+        <li><a href="#" data-i18n="careers">Careers</a></li>
+        <li><a href="#" data-i18n="privacy">Privacy</a></li>
+        <li><a href="#" data-i18n="terms">Terms</a></li>
+        <li><a href="mailto:info@traveme.com">info@traveme.com</a></li>
+      </ul>
+      <div class="socials">
+        <div class="social-btn"><i class="fab fa-instagram"></i></div>
+        <div class="social-btn"><i class="fab fa-twitter"></i></div>
+        <div class="social-btn"><i class="fab fa-linkedin-in"></i></div>
+      </div>
+      <span class="footer-copy" id="footer-copy">© 2025 TraveMe. All rights reserved.</span>
     </div>
-    <div class="w-16 h-12 bg-gray-400 rounded overflow-hidden cursor-pointer">
-      <img src="img/link bridge.jpg" alt="thumb" class="w-full h-full object-cover thumbnail">
-    </div>
-    <div class="w-16 h-12 bg-gray-400 rounded overflow-hidden cursor-pointer">
-      <img src="img/Rock.jpg" alt="thumb" class="w-full h-full object-cover thumbnail">
-    </div>
-    <div class="w-16 h-12 bg-gray-400 rounded overflow-hidden cursor-pointer">
-      <img src="img/Eko.jpg" alt="thumb" class="w-full h-full object-cover thumbnail">
-    </div>
-    <div class="w-16 h-12 bg-gray-400 rounded overflow-hidden cursor-pointer">
-      <img src="img/Cowie Termial.jpg" alt="thumb" class="w-full h-full object-cover thumbnail">
-    </div>
-  </div>
-</div>
-</section>
-<script>
-  // Thumbnail click handler
-  const mainImage = document.getElementById("main-image");
-  const thumbnails = document.querySelectorAll(".thumbnail");
+  </footer>
 
-  thumbnails.forEach(thumb => {
-    thumb.addEventListener("click", () => {
-      mainImage.src = thumb.src; // replace big image with thumbnail image
+  <script>
+    const i18n = {
+      en: {
+        nav_dest: 'Destinations', nav_pkg: 'Packages', nav_price: 'Pricing', nav_about: 'About',
+        login: 'Log in', register: 'Register',
+        hero_eyebrow: '✦ Discover the World',
+        hero_sub: 'Discover a new way to travel — effortless, exciting, and unforgettable. Turn your dream destinations into living memories.',
+        hero_cta1: 'Explore Now', hero_cta2: 'Watch Film',
+        search_dest: 'Destination', search_dest_ph: 'City or country',
+        date_label: 'Travel Date', date_placeholder: 'Pick a date',
+        landscape_label: 'Landscape', landscape_any: 'Any type',
+        landscape_city: 'City', landscape_desert: 'Desert', landscape_beach: 'Beach', landscape_mountain: 'Mountain',
+        search_btn: 'Search',
+        about: 'About', careers: 'Careers', privacy: 'Privacy', terms: 'Terms',
+        copyright: '© 2025 TraveMe. All rights reserved.',
+        book_now: 'Book Now',
+        cal_confirm: 'Confirm',
+        scroll_hint: 'Scroll',
+        dest_label: 'Curated for You',
+        dest_heading: 'Recommended\nDestinations',
+        view_all: 'View All',
+        why_label: 'Why Choose Us',
+        why_heading: 'Elevate Your\nAdventures',
+        why_body: 'At TraveMe, we believe every journey should be effortless, exciting, and unforgettable. We go beyond booking — we craft experiences that change the way you see the world.',
+        perk1_title: 'Expert Guides', perk1_body: 'Local experts who bring destinations to life with stories and secrets.',
+        perk2_title: 'Diving & Snorkeling', perk2_body: 'Unforgettable underwater adventures in the world\'s most stunning reefs.',
+        perk3_title: 'Memorable Moments', perk3_body: 'Trips designed to create stories that last a lifetime.',
+        perk4_title: 'Seamless Comfort', perk4_body: 'Premium travel logistics handled so you can focus on exploring.',
+        stat1_label: 'Happy Travelers', stat2_label: 'Destinations', stat3_label: '% Satisfaction',
+        picks_label: 'Handpicked for You',
+        picks_heading: 'Where Comfort Meets\nConvenience',
+        blog_label: 'Travel Stories',
+        blog_heading: 'Although A Picture Is Worth A Thousand Words',
+        blog_tag1: 'Traveling', blog_tag2: 'Destinations', blog_tag3: 'Tips',
+        blog_t1: '5 Reasons Why Solo Travel Is the Best Gift You Can Give Yourself',
+        blog_t2: 'Underrated Travel Destinations You Should Visit This Year',
+        blog_t3: 'How to Plan the Perfect Weekend Getaway Without the Stress',
+        testimonial_text: 'Traveling alone was something I used to fear, but it turned out to be the most empowering experience of my life.',
+        reviewer_role: 'Solo Traveler & Guest',
+        contact_label: 'Stay in Touch',
+        contact_heading: 'Reach Out Anytime\nFor Travel Tips',
+        contact_body: 'Whether you\'re planning your next adventure, need details about our services, or just want to chat about travel ideas — don\'t hesitate to reach out.',
+        contact_email_ph: 'Your email address',
+        contact_submit: 'Submit',
+        footer_tagline: 'We craft extraordinary travel experiences that turn dreams into memories.',
+        wdays: ['Su','Mo','Tu','We','Th','Fr','Sa'],
+        heroSlides: [
+          ['Easy Trips,', 'More Fun.'],
+          ['Discover the', 'Unknown.'],
+          ['Life is Short,', 'Travel More.'],
+          ['Your World,', 'Your Way.'],
+          ['Adventure', 'Awaits You.'],
+        ],
+      },
+      es: {
+        nav_dest: 'Destinos', nav_pkg: 'Paquetes', nav_price: 'Precios', nav_about: 'Nosotros',
+        login: 'Ingresar', register: 'Registrarse',
+        hero_eyebrow: '✦ Descubre el Mundo',
+        hero_sub: 'Descubre una nueva forma de viajar — sin esfuerzo, emocionante e inolvidable. Convierte tus destinos soñados en memorias reales.',
+        hero_cta1: 'Explorar Ahora', hero_cta2: 'Ver Película',
+        search_dest: 'Destino', search_dest_ph: 'Ciudad o país',
+        date_label: 'Fecha de Viaje', date_placeholder: 'Elige una fecha',
+        landscape_label: 'Paisaje', landscape_any: 'Cualquier tipo',
+        landscape_city: 'Ciudad', landscape_desert: 'Desierto', landscape_beach: 'Playa', landscape_mountain: 'Montaña',
+        search_btn: 'Buscar',
+        about: 'Nosotros', careers: 'Empleos', privacy: 'Privacidad', terms: 'Términos',
+        copyright: '© 2025 TraveMe. Todos los derechos reservados.',
+        book_now: 'Reservar Ahora',
+        cal_confirm: 'Confirmar',
+        scroll_hint: 'Bajar',
+        dest_label: 'Solo para Ti',
+        dest_heading: 'Destinos\nRecomendados',
+        view_all: 'Ver Todo',
+        why_label: 'Por Qué Elegirnos',
+        why_heading: 'Eleva Tus\nAventuras',
+        why_body: 'En TraveMe, creemos que cada viaje debe ser sin esfuerzo, emocionante e inolvidable. Vamos más allá de las reservas — creamos experiencias que cambian tu visión del mundo.',
+        perk1_title: 'Guías Expertos', perk1_body: 'Expertos locales que dan vida a los destinos con historias y secretos.',
+        perk2_title: 'Buceo y Snorkel', perk2_body: 'Aventuras submarinas inolvidables en los arrecifes más impresionantes del mundo.',
+        perk3_title: 'Momentos Memorables', perk3_body: 'Viajes diseñados para crear historias que duran toda la vida.',
+        perk4_title: 'Comodidad Total', perk4_body: 'Logística de viaje premium para que te concentres en explorar.',
+        stat1_label: 'Viajeros Felices', stat2_label: 'Destinos', stat3_label: '% Satisfacción',
+        picks_label: 'Seleccionados para Ti',
+        picks_heading: 'Donde el Confort\nSe Une a la Comodidad',
+        blog_label: 'Historias de Viaje',
+        blog_heading: 'Aunque Una Imagen Vale Mil Palabras',
+        blog_tag1: 'Viajando', blog_tag2: 'Destinos', blog_tag3: 'Consejos',
+        blog_t1: '5 Razones por las que Viajar Solo es el Mejor Regalo que Puedes Darte',
+        blog_t2: 'Destinos de Viaje Infravaluados que Deberías Visitar Este Año',
+        blog_t3: 'Cómo Planificar la Escapada de Fin de Semana Perfecta Sin Estrés',
+        testimonial_text: 'Viajar sola era algo que solía temer, pero resultó ser la experiencia más enriquecedora de mi vida.',
+        reviewer_role: 'Viajera Sola & Invitada',
+        contact_label: 'Mantente en Contacto',
+        contact_heading: 'Contáctanos Cuando\nQuieras',
+        contact_body: 'Ya sea que estés planeando tu próxima aventura, necesites detalles sobre nuestros servicios, o simplemente quieras charlar sobre ideas de viaje — no dudes en contactarnos.',
+        contact_email_ph: 'Tu correo electrónico',
+        contact_submit: 'Enviar',
+        footer_tagline: 'Creamos experiencias de viaje extraordinarias que convierten los sueños en memorias.',
+        wdays: ['Do','Lu','Ma','Mi','Ju','Vi','Sá'],
+        heroSlides: [
+          ['Viajes Fáciles,', 'Más Diversión.'],
+          ['Descubre lo', 'Desconocido.'],
+          ['La Vida es Corta,', 'Viaja Más.'],
+          ['Tu Mundo,', 'Tu Manera.'],
+          ['La Aventura', 'Te Espera.'],
+        ],
+      }
+    };
+
+    let currentLang = 'en';
+
+    function applyLang(lang) {
+      const t = i18n[lang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (!t[key]) return;
+        const icons = [...el.querySelectorAll('i')].map(i => i.cloneNode(true));
+        el.textContent = t[key];
+        icons.forEach(ic => el.appendChild(ic));
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (!t[key]) return;
+        el.placeholder = t[key];
+      });
+      const dateVal = document.getElementById('date-val');
+      if (dateVal && !selectedDate) dateVal.textContent = t.date_placeholder;
+      document.querySelectorAll('select option[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key]) el.textContent = t[key];
+      });
+      const calConfirm = document.getElementById('cal-confirm');
+      if (calConfirm) calConfirm.textContent = t.cal_confirm;
+      const wdayEls = document.querySelectorAll('.cal-weekdays span');
+      wdayEls.forEach((el, i) => { el.textContent = t.wdays[i]; });
+      heroTitles = t.heroSlides.map(([a, b]) => [a, `<em>${b}</em>`]);
+      const heroTitleEl = document.getElementById('hero-title');
+      if (heroTitleEl) heroTitleEl.innerHTML = heroTitles[heroIdx][0] + '<br>' + heroTitles[heroIdx][1];
+      const blocks = {
+        'dest-section-label': t.dest_label,
+        'dest-section-heading': t.dest_heading ? t.dest_heading.replace('\n', '<br>') : '',
+        'view-all-link': t.view_all,
+        'why-label': t.why_label,
+        'why-heading': t.why_heading ? t.why_heading.replace('\n', '<br>') : '',
+        'why-body': t.why_body,
+        'perk1-title': t.perk1_title, 'perk1-body': t.perk1_body,
+        'perk2-title': t.perk2_title, 'perk2-body': t.perk2_body,
+        'perk3-title': t.perk3_title, 'perk3-body': t.perk3_body,
+        'perk4-title': t.perk4_title, 'perk4-body': t.perk4_body,
+        'stat1-label': t.stat1_label, 'stat2-label': t.stat2_label, 'stat3-label': t.stat3_label,
+        'picks-label': t.picks_label,
+        'picks-heading': t.picks_heading ? t.picks_heading.replace('\n', '<br>') : '',
+        'blog-label': t.blog_label,
+        'blog-heading': t.blog_heading,
+        'blog-tag1': t.blog_tag1, 'blog-tag2': t.blog_tag2, 'blog-tag3': t.blog_tag3,
+        'blog-title1': t.blog_t1, 'blog-title2': t.blog_t2, 'blog-title3': t.blog_t3,
+        'testimonial-text': t.testimonial_text,
+        'reviewer-role-el': t.reviewer_role,
+        'contact-label': t.contact_label,
+        'contact-heading': t.contact_heading ? t.contact_heading.replace('\n', '<br>') : '',
+        'contact-body': t.contact_body,
+        'contact-submit': t.contact_submit,
+        'footer-tagline': t.footer_tagline,
+        'footer-copy': t.copyright,
+        'scroll-hint-text': t.scroll_hint,
+      };
+      Object.entries(blocks).forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        if (el && val) el.innerHTML = val;
+      });
+      document.querySelectorAll('.btn-book-text').forEach(el => { el.textContent = t.book_now; });
+      const emailInput = document.querySelector('.email-form input');
+      if (emailInput) emailInput.placeholder = t.contact_email_ph;
+      renderCalendar();
+    }
+
+    // ─── CURSOR ───
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursor-ring');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cursor.style.left = mx + 'px'; cursor.style.top = my + 'px'; });
+    function animRing() { rx += (mx - rx) * .12; ry += (my - ry) * .12; ring.style.left = rx + 'px'; ring.style.top = ry + 'px'; requestAnimationFrame(animRing); }
+    animRing();
+    document.querySelectorAll('button, a, .dest-card, .pick-card, .blog-card').forEach(el => {
+      el.addEventListener('mouseenter', () => { cursor.style.width='18px'; cursor.style.height='18px'; ring.style.width='50px'; ring.style.height='50px'; ring.style.opacity='.3'; });
+      el.addEventListener('mouseleave', () => { cursor.style.width='10px'; cursor.style.height='10px'; ring.style.width='36px'; ring.style.height='36px'; ring.style.opacity='.6'; });
     });
-  });
-</script>
-<!-- Top Picks Section -->
-<section class="w-full relative py-16">
-  <!-- Big Image Background with gradient overlay -->
-  <div class="relative w-full h-[800px] md:h-[900px]">
-    <!-- Image with gradient overlay -->
-    <div class="relative w-full h-full">
-      <img src="img/Boat.jpg" alt="Top Picks Background" class="w-full h-full object-cover">
-      <!-- Gradient overlay directly on the image -->
-      <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-white via-white/50 to-transparent"></div>
-    </div>
 
-    <!-- Overlay Title -->
-    <div class="absolute top-60 inset-x-0 flex items-center justify-center">
-      <h2 class="text-3xl md:text-5xl font-bold text-black text-center px-4">
-        Where Comfort Meets Convenience <br> Our Top Stay Picks for You
-      </h2>
-    </div>
+    // ─── PARTICLES ───
+    const pCont = document.getElementById('particles');
+    for (let i = 0; i < 18; i++) {
+      const p = document.createElement('div');
+      const s = Math.random() * 60 + 10;
+      p.className = 'particle';
+      p.style.cssText = `width:${s}px;height:${s}px;left:${Math.random()*100}%;animation-duration:${Math.random()*20+15}s;animation-delay:${Math.random()*-20}s`;
+      pCont.appendChild(p);
+    }
 
-    <!-- Flash Card (stacked look) -->
-    <div class="absolute inset-x-0 top-[65.5%] flex justify-center">
-      <!-- Stacked background cards -->
-      <div class="absolute top-6 w-[80%] md:w-[65%] h-44 bg-white rounded-xl shadow opacity-60"></div>
-      <div class="absolute top-3 w-[82%] md:w-[67%] h-44 bg-white rounded-xl shadow opacity-80"></div>
-      
-      <!-- Main Card -->
-      <div class="relative flex bg-white rounded-xl shadow-lg overflow-hidden w-[85%] md:w-[70%] h-44">
-        <!-- Image -->
-        <div class="w-1/3 h-full bg-gray-300">
-          <img src="img/Dam square.jpg" alt="Dam square" class="w-full h-full object-cover">
-        </div>
-        <!-- Text -->
-        <div class="p-4 flex flex-col justify-center">
-          <span class="text-sm text-gray-500">-005</span>
-          <h4 class="font-bold text-lg">Dam square</h4>
-          <p class="text-gray-600 text-sm mt-1">Start discovering royal heritage and get more enchanting urban scenes.</p>
-        </div>
-      </div>
-    </div>
+    // ─── HERO SLIDES ───
+    const heroGrads = [
+      'linear-gradient(135deg, #0f2027 0%, #203a43 40%, #2c5364 70%, #1a3a2a 100%)',
+      'linear-gradient(135deg, #1a0533 0%, #3c1361 40%, #c4714a 100%)',
+      'linear-gradient(135deg, #0d0d0d 0%, #2c5364 50%, #2d6e6e 100%)',
+      'linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #c9a84c 100%)',
+      'linear-gradient(135deg, #2d1b00 0%, #8b4513 40%, #c4714a 70%, #ffd700 100%)',
+    ];
+    let heroTitles = i18n.en.heroSlides.map(([a, b]) => [a, `<em>${b}</em>`]);
+    let heroIdx = 0;
+    let selectedDate = null;
+    let calDate = new Date();
 
-    <!-- See More Button -->
-    <div class="absolute bottom-12 inset-x-0 flex justify-center">
-      <button class="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition">
-        See More
-      </button>
-    </div>
-  </div>
-</section>
-<!-- Blog Section -->
-<section class="max-w-6xl mx-auto px-6 py-16">
-  <h2 class="text-3xl md:text-4xl font-bold mb-10">Although A Picture Is Worth A Thousand Words</h2>
+    const MONTHS_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const MONTHS_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-    <!-- Card 1 -->
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-      <img src="img/Boat.jpg" alt="Solo Travel" class="w-full h-48 object-cover">
-      <div class="p-4">
-        <div class="flex items-center justify-between text-xs text-gray-500 mb-2">
-          <span class="bg-blue-600 text-white px-2 py-1 rounded">Traveling</span>
-          <span>10 min read</span>
-          <span class="flex items-center space-x-1">
-            <!-- Calendar Icon -->
-            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7H3v12a2 2 0 002 2z"/>
-            </svg>
-            <span>12 Sep 2025</span>
-          </span>
-        </div>
-        <h3 class="font-bold text-lg">5 Reasons Why Solo Travel Is the Best Gift You Can Give Yourself</h3>
-      </div>
-    </div>
+    function renderCalendar() {
+      const calPopupEl = document.getElementById('cal-popup');
+      if (!calPopupEl) return;
+      const months = currentLang === 'es' ? MONTHS_ES : MONTHS_EN;
+      const calMonthLbl = document.getElementById('cal-month-label');
+      const calDaysEl = document.getElementById('cal-days');
+      if (!calMonthLbl || !calDaysEl) return;
+      calMonthLbl.textContent = `${months[calDate.getMonth()]} ${calDate.getFullYear()}`;
+      calDaysEl.innerHTML = '';
+      const year = calDate.getFullYear(), month = calDate.getMonth();
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const today = new Date();
+      for (let i = 0; i < firstDay; i++) {
+        const blank = document.createElement('div');
+        blank.className = 'cal-day empty';
+        calDaysEl.appendChild(blank);
+      }
+      for (let d = 1; d <= daysInMonth; d++) {
+        const el = document.createElement('div');
+        el.className = 'cal-day';
+        el.textContent = d;
+        const thisDate = new Date(year, month, d);
+        if (thisDate < new Date(today.getFullYear(), today.getMonth(), today.getDate())) el.classList.add('disabled');
+        if (today.getDate()===d && today.getMonth()===month && today.getFullYear()===year) el.classList.add('today');
+        if (selectedDate && selectedDate.getDate()===d && selectedDate.getMonth()===month && selectedDate.getFullYear()===year) el.classList.add('selected');
+        el.addEventListener('click', () => { selectedDate = new Date(year, month, d); renderCalendar(); });
+        calDaysEl.appendChild(el);
+      }
+    }
 
-    <!-- Card 2 -->
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-      <img src="img/Mount-Fuji.jpg" alt="Underrated Travel Destinations" class="w-full h-48 object-cover">
-      <div class="p-4">
-        <div class="flex items-center justify-between text-xs text-gray-500 mb-2">
-          <span class="bg-blue-600 text-white px-2 py-1 rounded">Traveling</span>
-          <span>10 min read</span>
-          <span class="flex items-center space-x-1">
-            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7H3v12a2 2 0 002 2z"/>
-            </svg>
-            <span>12 Sep 2025</span>
-          </span>
-        </div>
-        <h3 class="font-bold text-lg">Underrated Travel Destinations You Should Visit This Year</h3>
-      </div>
-    </div>
+    const heroBg = document.getElementById('hero-bg');
+    const heroTitleEl = document.getElementById('hero-title');
+    const dotsCont = document.getElementById('hero-dots');
+    const dots = [];
 
-    <!-- Card 3 -->
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-      <img src="img/Ghana .jpg" alt="Weekend Getaway" class="w-full h-48 object-cover">
-      <div class="p-4">
-        <div class="flex items-center justify-between text-xs text-gray-500 mb-2">
-          <span class="bg-blue-600 text-white px-2 py-1 rounded">Traveling</span>
-          <span>10 min read</span>
-          <span class="flex items-center space-x-1">
-            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7H3v12a2 2 0 002 2z"/>
-            </svg>
-            <span>12 Sep 2025</span>
-          </span>
-        </div>
-        <h3 class="font-bold text-lg">How to Plan the Perfect Weekend Getaway Without the Stress</h3>
-      </div>
-    </div>
-  </div>
-</section>
-<!-- Testimonial Section -->
-<section class="max-w-3xl mx-auto px-6 py-16 text-center">
-  <!-- Quotation Mark Icon + Avatar -->
-  <div class="flex justify-center items-center space-x-2 mb-6">
-    <span class="text-4xl text-gray-400">“</span>
-    <img src="img/Made in china.jpg" alt="Reviewer" class="w-12 h-12 rounded-full border">
-  </div>
+    heroGrads.forEach((_, i) => {
+      const d = document.createElement('div');
+      d.className = 'dot' + (i === 0 ? ' active' : '');
+      d.addEventListener('click', () => goHero(i));
+      dotsCont.appendChild(d);
+      dots.push(d);
+    });
 
-  <!-- Quote -->
-  <p class="text-2xl md:text-3xl font-medium text-gray-800 leading-relaxed mb-6">
-    Traveling alone was something I used to fear, but it turned out to be the most empowering experience of my life.
-  </p>
+    function goHero(idx) {
+      heroIdx = idx;
+      heroBg.style.background = heroGrads[idx];
+      heroTitleEl.innerHTML = heroTitles[idx][0] + '<br>' + heroTitles[idx][1];
+      dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+      anime({ targets: '#hero-title', opacity: [0, 1], translateY: [20, 0], duration: 600, easing: 'easeOutCubic' });
+    }
+    document.getElementById('prev-hero').addEventListener('click', () => goHero((heroIdx - 1 + heroGrads.length) % heroGrads.length));
+    document.getElementById('next-hero').addEventListener('click', () => goHero((heroIdx + 1) % heroGrads.length));
+    setInterval(() => goHero((heroIdx + 1) % heroGrads.length), 5000);
 
-  <!-- Rating -->
-  <div class="flex justify-center items-center space-x-2">
-    <div class="flex text-yellow-500">
-      ★★★★★
-    </div>
-    <span class="text-gray-700 font-medium">5.0</span>
-  </div>
+    anime.timeline({ easing: 'easeOutExpo' })
+      .add({ targets: '#hero-eyebrow', opacity: [0,1], translateY: [20,0], duration: 800 })
+      .add({ targets: '#hero-title', opacity: [0,1], translateY: [30,0], duration: 900 }, '-=400')
+      .add({ targets: '#hero-sub', opacity: [0,1], translateY: [20,0], duration: 700 }, '-=500')
+      .add({ targets: '#hero-cta', opacity: [0,1], translateY: [20,0], duration: 600 }, '-=400')
+      .add({ targets: '#search-section', opacity: [0,1], translateY: [40,0], duration: 800 }, '-=200');
 
-  <!-- Author -->
-  <p class="text-sm text-gray-500 mt-2">Jake Danielson, Guest</p>
-</section>
-<!-- Contact Section -->
-<section class="relative w-full">
-  <!-- Background Image -->
-  <div class="absolute top-[-5px] left-0 right-0 h-[450px] w-[calc(100%-50px)] mx-auto rounded-2xl overflow-hidden">
-    <img src="img/Beach.jpeg" alt="Travel Background" class="w-full h-full object-cover">
-    <div class="absolute inset-0 bg-black/40"></div> <!-- Overlay -->
-  </div>
+    window.addEventListener('scroll', () => {
+      document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 60);
+    });
 
-  <!-- Content -->
-  <div class="relative z-10 max-w-4xl mx-auto px-6 text-center text-white h-[450px] flex flex-col justify-center">
-    <!-- Title -->
-    <h2 class="text-3xl md:text-4xl font-bold mb-4">
-      Reach out anytime for travel tips or info
-    </h2>
+    let isES = false;
+    document.getElementById('lang-pill').addEventListener('click', () => {
+      isES = !isES;
+      currentLang = isES ? 'es' : 'en';
+      document.getElementById('lang-en').classList.toggle('active', !isES);
+      document.getElementById('lang-es').classList.toggle('active', isES);
+      applyLang(currentLang);
+      anime({ targets: 'body', opacity: [.85, 1], duration: 300, easing: 'easeOutQuad' });
+    });
 
-    <!-- Bio -->
-    <p class="mb-8 max-w-2xl mx-auto text-lg">
-      Whether you're planning your next adventure, need more details about our services, 
-      or just want to chat about travel ideas – don't hesitate to reach out.
-    </p>
+    const calPopup = document.getElementById('cal-popup');
+    const dateDisplay = document.getElementById('date-display');
+    const dateVal = document.getElementById('date-val');
 
-    <!-- Email Input -->
-    <div class="flex justify-center">
-      <div class="input-container">
-        <input required="" placeholder="Email Address" type="email">
-        <button class="invite-btn" type="button">
-          Submit
-        </button>
-      </div>
-    </div>
-  </div>
-</section>
+    dateDisplay.addEventListener('click', (e) => {
+      e.stopPropagation();
+      calPopup.classList.toggle('open');
+      if (calPopup.classList.contains('open')) renderCalendar();
+    });
+    document.getElementById('cal-prev').addEventListener('click', (e) => {
+      e.stopPropagation();
+      calDate.setMonth(calDate.getMonth() - 1);
+      renderCalendar();
+    });
+    document.getElementById('cal-next').addEventListener('click', (e) => {
+      e.stopPropagation();
+      calDate.setMonth(calDate.getMonth() + 1);
+      renderCalendar();
+    });
+    document.getElementById('cal-confirm').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (selectedDate) {
+        const months = currentLang === 'es' ? MONTHS_ES : MONTHS_EN;
+        dateVal.textContent = `${selectedDate.getDate()} ${months[selectedDate.getMonth()].slice(0,3)} ${selectedDate.getFullYear()}`;
+        dateVal.classList.remove('placeholder');
+      }
+      calPopup.classList.remove('open');
+    });
+    document.addEventListener('click', (e) => {
+      if (!document.getElementById('date-field').contains(e.target)) calPopup.classList.remove('open');
+    });
 
-<!-- Footer Section -->
-<footer class="w-full bg-black text-white pt-12 pb-8">
-  <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-10">
-    <!-- Left Side -->
-    <div class="flex flex-col space-y-5 md:col-span-1">
-      <span class="text-sm text-gray-400">&copy; 2024 TraveMe. All rights reserved.</span>
-      <!-- Image box -->
-      <div class="w-32 h-24 rounded-xl overflow-hidden">
-        <img src="img/Eko.jpg" alt="Footer Image" class="w-full h-full object-cover rounded-xl">
-      </div>
-      <!-- Social Media Icons -->
-      <div class="flex space-x-4 mt-2">
-        <a href="#" class="hover:text-cyan-400 transition"><i class="fab fa-facebook-f text-xl"></i></a>
-        <a href="#" class="hover:text-cyan-400 transition"><i class="fab fa-twitter text-xl"></i></a>
-        <a href="#" class="hover:text-cyan-400 transition"><i class="fab fa-instagram text-xl"></i></a>
-        <a href="#" class="hover:text-cyan-400 transition"><i class="fab fa-linkedin-in text-xl"></i></a>
-      </div>
-    </div>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        const isLeft = el.classList.contains('reveal-left');
+        const isRight = el.classList.contains('reveal-right');
+        anime({
+          targets: el,
+          opacity: [0, 1],
+          translateX: isLeft ? [-40, 0] : isRight ? [40, 0] : 0,
+          translateY: (!isLeft && !isRight) ? [30, 0] : 0,
+          duration: 800,
+          easing: 'easeOutCubic',
+        });
+        observer.unobserve(el);
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => observer.observe(el));
 
-    <!-- Middle -->
-    <div class="flex flex-col justify-center items-center md:col-span-1 lg:col-span-2">
-      <h2 class="text-2xl md:text-4xl font-extrabold text-center mb-2">Let’s Make Your Next Journey Unforgettable</h2>
-    </div>
+    const destObs = new IntersectionObserver((entries) => {
+      if (entries.some(e => e.isIntersecting)) {
+        anime({ targets: '.dest-card', opacity: [0,1], translateY: [40,0], duration: 700, delay: anime.stagger(100, {start:100}), easing: 'easeOutCubic' });
+        destObs.disconnect();
+      }
+    }, { threshold: 0.1 });
+    destObs.observe(document.getElementById('dest-grid'));
 
-    <!-- Right Side -->
-    <div class="flex flex-col md:items-end md:justify-between md:col-span-1">
-      <div class="mb-5">
-        <h3 class="font-semibold text-lg mb-2">Contact</h3>
-        <ul class="text-sm text-gray-300 space-y-1">
-          <li>Email: <a href="mailto:info@traveme.com" class="hover:text-cyan-400">info@traveme.com</a></li>
-          <li>Phone: <a href="tel:+123456789" class="hover:text-cyan-400">+1 234 567 89</a></li>
-          <li>123 Adventure Ave, Wanderlust City</li>
-        </ul>
-      </div>
-      <div class="grid grid-cols-2 gap-6">
-        <div>
-          <h4 class="font-semibold mb-2">Company</h4>
-          <ul class="space-y-1 text-sm text-gray-300">
-            <li><a href="#" class="hover:text-cyan-400">About Us</a></li>
-            <li><a href="#" class="hover:text-cyan-400">Careers</a></li>
-            <li><a href="#" class="hover:text-cyan-400">Blog</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="font-semibold mb-2">Resources</h4>
-          <ul class="space-y-1 text-sm text-gray-300">
-            <li><a href="#" class="hover:text-cyan-400">Help Center</a></li>
-            <li><a href="#" class="hover:text-cyan-400">Privacy Policy</a></li>
-            <li><a href="#" class="hover:text-cyan-400">Terms</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</footer>
-<!--  CDN for social icons (only for demo, use local/prod as needed) -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    const counterObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        document.querySelectorAll('[data-count]').forEach(el => {
+          const target = +el.getAttribute('data-count');
+          anime({
+            targets: { val: 0 }, val: target, duration: 1800, easing: 'easeOutExpo', round: 1,
+            update: function(anim) {
+              const v = anim.animations[0].currentValue;
+              el.textContent = target >= 1000 ? (v/1000).toFixed(1)+'K+' : Math.round(v)+(target===98?'%':'+');
+            }
+          });
+        });
+        counterObs.disconnect();
+      });
+    }, { threshold: 0.3 });
+    counterObs.observe(document.querySelector('.stats-row'));
+
+    const pickObs = new IntersectionObserver((entries) => {
+      if (entries.some(e => e.isIntersecting)) {
+        anime({ targets: '.pick-card', opacity: [0,1], translateX: [50,0], duration: 700, delay: anime.stagger(120), easing: 'easeOutCubic' });
+        pickObs.disconnect();
+      }
+    }, { threshold: 0.1 });
+    pickObs.observe(document.querySelector('.picks-scroll'));
+  </script>
+</body>
+</html>
