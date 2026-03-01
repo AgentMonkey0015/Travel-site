@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TraveMe</title>
+  <!-- Favicon -->
+  <link rel="icon" href="img/Airplane.png" sizes="any">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -20,8 +22,13 @@
       --gold: #c9a84c;
       --mist: #8a9ba8;
       --white: #ffffff;
+  
     }
-
+        html {
+      scroll-behavior: smooth;
+      overscroll-behavior-y: none;
+    }
+    
     html { scroll-behavior: smooth; }
 
     body {
@@ -755,6 +762,28 @@
       .footer-inner { grid-template-columns: 1fr; }
       .search-divider { display: none; }
     }
+    /* Hide default cursor everywhere */
+    * {
+      cursor: none !important;
+    }
+
+    /* Custom Cursor */
+    .custom-cursor {
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+      transition: transform 0.15s ease, width 0.15s ease, height 0.15s ease;
+    }
+
+    .cursor-grow {
+      width: 40px;
+      height: 40px;
+    }
   </style>
 </head>
 <body>
@@ -1167,6 +1196,8 @@
     </div>
   </footer>
 
+  <div class="custom-cursor"></div>
+
   <script>
     const i18n = {
       en: {
@@ -1543,3 +1574,20 @@
   </script>
 </body>
 </html>
+    const cursor = document.querySelector(".custom-cursor");
+
+    document.addEventListener("mousemove", (e) => {
+      cursor.style.left = e.clientX + "px";
+      cursor.style.top = e.clientY + "px";
+    });
+
+    const hoverElements = document.querySelectorAll("a, button, .card, .adventure-card");
+
+    hoverElements.forEach(el => {
+      el.addEventListener("mouseenter", () => {
+        cursor.classList.add("cursor-grow");
+      });
+      el.addEventListener("mouseleave", () => {
+        cursor.classList.remove("cursor-grow");
+      });
+    });
